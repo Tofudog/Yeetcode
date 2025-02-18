@@ -27,12 +27,22 @@
     <div id="create-screen" class="screen">
         <button id="back-to-main-create" class="back-btn">←</button>
         <h2>Invite Code: <span id="inviteCode" class="invite-code">or4L</span></h2>
-        <label for="playerName">You</label>
-        <input type="text" id="playerName" placeholder="Player 1">
-        <label for="competitorName">Competitor</label>
-        <input type="text" id="competitorName" placeholder="">
-        <button id="start-game" class="btn">START</button>
+        
+        <div class="input-container">
+            <div class="input-group">
+                <label for="playerName" class="player-name">You</label>
+                <input type="text" class="input-text" id="playerName" placeholder="Player 1">
+            </div>
+    
+            <div class="input-group">
+                <label for="competitorName" class="competitor-name">Competitor</label>
+                <input type="text" class="input-text" id="competitorName" placeholder="">
+            </div>
+        </div>
+    
+        <button id="start-game" class="start-btn">START</button>
     </div>
+    
 
     <script src="popup.js"></script>
 </body>
