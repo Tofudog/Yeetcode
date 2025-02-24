@@ -56,21 +56,6 @@ input {
     border: 1px solid #ccc;
 }
 
-.input-group {
-    margin-bottom: 1rem;
-}
-
-.input-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-}
-
-.input-group input {
-    padding-left: 10px;
-    width: 100%; 
-    box-sizing: border-box; 
-}
-
 /* Highlighted Text */
 .highlight {
     color: #f5a623;
@@ -95,55 +80,23 @@ input {
     font-size: 18px;
 }
 
-/* Player Name*/
-.player-name {
-
-    font-family: 'Roboto';
-    width: 39px;
-    height: 12px;
-    color: #56658F; 
-    font-weight: bold;
-
-}
-
-/* Competitor Name*/
-.competitor-name {
-
-    font-family: 'Roboto';
-    width: 39px;
-    height: 12px;
-    color: #56658F; 
-    font-weight: bold;
-
-}
-
-/* Input text*/
-.input-text {
-    width: 114px;
-    height: 25px;
-    background-color: #FFFFFF;
-    opacity: 1; 
-    border-radius: 60px;
-}
-
-/* Start Button */
-.start-btn {
-    background-color: #4a5d9b;
-    color: white;
-    border: none;
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    font-size: 1rem;
-    font-weight: bold;
-    margin-top: 20px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    transition: transform 0.2s;
+/* Style for input-container and label alignment */
+.input-container {
     display: flex;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column; /* Stack label and input vertically */
+    align-items: flex-start; /* Align items to the left */
+    margin-bottom: 10px;
 }
 
-.start-btn:hover {
-    transform: scale(1.05);
+.input-container label {
+    text-align: left; /* Ensure label is aligned to the left */
+    margin-bottom: 5px; /* Space between label and input */
 }
+
+.input-container input {
+    padding: 8px;
+    font-size: 14px;
+    width: 100%;  /* Make input take up full width */
+    box-sizing: border-box;
+}
+

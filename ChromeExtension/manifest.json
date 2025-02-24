@@ -6,19 +6,19 @@
   "permissions": ["storage"],
   "host_permissions": ["https://*.firebaseio.com/"],
   "background": {
-    "service_worker": "background.js",
+    "service_worker": "Frontend/assets/js/background.js",
     "type": "module"
   },
   "action": {
-    "default_popup": "hello.html",
-    "default_icon": "logo.png"
+    "default_popup": "Frontend/main-screen.html",
+    "default_icon": "Frontend/assets/images/logo.png"
   },
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'"
+    "extension_pages": "script-src 'self'"
   },
   "web_accessible_resources": [
     {
-      "resources": ["firebase-app.js", "firebase-database.js"],
+      "resources": ["/firebase-app.js", "/firebase-database.js"],
       "matches": ["<all_urls>"]
     }
   ]
