@@ -3,7 +3,7 @@
   "name": "Yeetcode",
   "version": "1.0",
   "description": "Yeetcode extension for cs geeks",
-  "permissions": ["storage", "tabs"],
+  "permissions": ["storage", "tabs", "sidePanel"],
   "host_permissions": ["<all_urls>"],
   "background": {
     "service_worker": "Frontend/assets/js/background.js"
@@ -19,11 +19,15 @@
     "default_icon": "Frontend/assets/images/logo.png",
     "default_title": "Leetcode"
   },
+  "side_panel": {
+    "default_path": "Frontend/main-screen.html"
+  },
   "web_accessible_resources": [
     {
       "resources": ["Frontend/js/contentScript.js"],
-      "matches":["<all_urls>"]
-  }],
+      "matches": ["<all_urls>"]
+    }
+  ],
   "content_security_policy": {
     "extension_pages": "script-src 'self'"
   }

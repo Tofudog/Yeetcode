@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RIP Effect</title>
+    <style>
+        body {
+            width: 300px;
+            height: 350px;
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            background-color: #eef2ff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .container {
+            position: relative;
+            font-size: 24px;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Emoji for the ripping action */
+        .emoji {
+            position: absolute;
+            left: 50%;
+            top: 40%;
+            transform: translateX(-50%);
+            font-size: 35px; /* Smaller emoji size */
+            animation: ripMove 2s ease-in-out forwards;
+        }
+
+        .emoji::after {
+            content: "( っ'-')╮"; /* Starting emoji */
+            animation: emojiChange 2s ease-in-out forwards;
+        }
+
+        /* Left part of the text that will be ripped */
+        .text-left {
+            position: absolute;
+            top: 50%;
+            left: 45%;
+            font-size: 20px;
+            transform-origin: right center;
+            animation: ripLeft 2s ease-in-out forwards;
+            opacity: 1; /* Keep text visible */
+        }
+
+        /* Right part of the text that will be ripped */
+        .text-right {
+            position: absolute;
+            top: 50%;
+            left: 55%;
+            font-size: 20px;
+            transform-origin: left center;
+            animation: ripRight 2s ease-in-out forwards;
+            opacity: 1; /* Keep text visible */
+        }
+
+        /* Keyframes for the emoji ripping motion */
+        @keyframes ripMove {
+            0% {
+                transform: translateX(-50%) scale(1);
+            }
+            50% {
+                transform: translateX(-50%) scale(1.2); /* Emoji grows slightly */
+            }
+            100% {
+                transform: translateX(-50%) scale(1);
+            }
+        }
+
+        /* Keyframes for the emoji content change */
+        @keyframes emojiChange {
+            0% {
+                content: "( っ'-')╮"; /* Initial emoji */
+            }
+            100% {
+                content: "⊂( '-' )⊃"; /* Final emoji after rip */
+            }
+        }
+
+        /* Left text piece ripping animation */
+        @keyframes ripLeft {
+            0% {
+                transform: translateX(0) rotate(0deg);
+                opacity: 1;
+            }
+            50% {
+                transform: translateX(-20px) rotate(-10deg);
+            }
+            100% {
+                transform: translateX(-100px) rotate(-30deg);
+                opacity: 1; /* Keep the left text visible */
+            }
+        }
+
+        /* Right text piece ripping animation */
+        @keyframes ripRight {
+            0% {
+                transform: translateX(0) rotate(0deg);
+                opacity: 1;
+            }
+            50% {
+                transform: translateX(20px) rotate(10deg);
+            }
+            100% {
+                transform: translateX(100px) rotate(30deg);
+                opacity: 1; /* Keep the right text visible */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="emoji"></div> <!-- Emoji that changes -->
+        <div class="text-left">לאו</div> <!-- Left part of the text -->
+        <div class="text-right">נרדו</div> <!-- Right part of the text -->
+        <!-- Need to add JS file to split the loser username and -->
+        <!-- VERY NOTABLE CHANGE FOR GIT TESTING -->
+    </div>
+</body>
+</html>
