@@ -9,6 +9,7 @@
     "service_worker": "Frontend/assets/js/background.js",
     "type": "module"
   },
+<<<<<<< Updated upstream
   "action": {
     "default_popup": "Frontend/main-screen.html",
     "default_icon": "Frontend/assets/images/logo.png"
@@ -16,10 +17,35 @@
   "content_security_policy": {
     "extension_pages": "script-src 'self'"
   },
+=======
+  "side_panel": {
+    "default_path": "Frontend/main-screen.html"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["Frontend/assets/js/contentScript.js"]
+    }
+  ],
+  "action": {
+    "default_icon": "Frontend/assets/images/logo.png",
+    "default_title": "Leetcode"
+  },
+>>>>>>> Stashed changes
   "web_accessible_resources": [
     {
       "resources": ["/firebase-app.js", "/firebase-database.js"],
       "matches": ["<all_urls>"]
     }
+<<<<<<< Updated upstream
   ]
 }
+=======
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'"
+  }
+
+}
+>>>>>>> Stashed changes

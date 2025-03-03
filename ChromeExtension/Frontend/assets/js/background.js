@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
 import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
 
@@ -29,3 +30,19 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true; // Required for async response
   }
 });
+=======
+chrome.runtime.onInstalled.addListener(() =>  {
+    chrome.sidePanel.setOptions({ path: "Frontend/main-screen.html" })
+    chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true});
+});
+
+chrome.tabs.onUpdated.addListener((tabId, tab) => {
+    console.log("\n\nTesting: BACKGROUND LOGS!!!\n\n")
+    console.log("HEY HEY HEY")
+    console.log("YES YES YES")
+    
+    chrome.tabs.sendMessage(tabId, {
+        message: "connected"
+    })
+  })
+>>>>>>> Stashed changes
