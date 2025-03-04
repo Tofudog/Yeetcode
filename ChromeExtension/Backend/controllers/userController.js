@@ -1,4 +1,25 @@
 import User from '../models/userModel.js';
+import isValid from '../utils/validateUser.js';
+
+// Create a new user
+const createUser = async (req, res) => {
+  const { username } = req.body;
+
+  try {
+    // Validate Username
+    const validUser = await isValid(username);
+    console.log(username)
+    if (!validUser) {
+        return res.status(400).json({ message: 'Invalid LeetCode username.' });
+    }
+
+    const newUser = new User({ username });
+    await newUser.save();
+    res.status(201).json(newUser);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
 
 // Get all users
 const getAllUsers = async (req, res) => {
@@ -17,19 +38,6 @@ const getUserById = async (req, res) => {
     if (!user) return res.status(404).json({ message: 'User not found' });
 
     res.status(200).json(user);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
-
-// Create a new user
-const createUser = async (req, res) => {
-  const { username } = req.body;
-
-  try {
-    const newUser = new User({ username });
-    await newUser.save();
-    res.status(201).json(newUser);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
