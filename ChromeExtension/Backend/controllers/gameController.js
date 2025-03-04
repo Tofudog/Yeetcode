@@ -1,6 +1,6 @@
 import Game from '../models/gameModel.js';
 import User from '../models/userModel.js';
-import InvitationCode from '../models/invitationModel.js';
+import InvitationCode from '../models/InvitationCodeModel.js';
 
 // Get all games
 const getAllGames = async (req, res) => {
