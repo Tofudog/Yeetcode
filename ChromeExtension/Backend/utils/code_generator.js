@@ -1,7 +1,7 @@
 const letters = "001122334455667778899abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const numLetters = letters.length;
 
-function generateRandomCode() {
+const generateRandomCode = () => {
     var code = "";
     for (var i=0; i<4; i++) {
         let idx = Math.floor(Math.random()*numLetters);
@@ -10,4 +10,4 @@ function generateRandomCode() {
     return code;
 }
 
-module.exports = generateRandomCode;
+export default generateRandomCode;
