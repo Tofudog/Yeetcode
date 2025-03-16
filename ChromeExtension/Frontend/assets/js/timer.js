@@ -1,4 +1,5 @@
 import updateSubmission from "../../../Backend/utils/gameLoop.js";
+import innerHtmlStyle from "./innerHtml.js";
 
 const CHECKING_IF_PASSED = true; //Can change this to true if want to check a submission passed
 const CYCLE_AMOUNT = 15; //Number of seconds per API Call
@@ -6,15 +7,15 @@ let PLAYER1 = ""; //both players will be defined by the user
 let PLAYER2 = "";
 const PROBLEM_LIST = [
     "two-sum",
-    "big-countries",
+    "maximum-candies-allocated-to-k-children",
     "reverse-integer"
 ];
 const NUM_USERS = 2;
 const NUM_PROBLEMS = 3;
 
 var currentCorrectSubmissions = [
-    [false, false, false],
-    [false, false, false]
+    [0, 0, 0],
+    [0, 0, 0]
 ];
 
 var numHours = 0;
@@ -75,12 +76,18 @@ var intervalTimer = setInterval(async function() {
         const updatedPlayerSubmissions = await updateSubmission(PLAYER1, PLAYER2, PROBLEM_LIST);
         for (var i=0; i<NUM_USERS; i++) {
             for (var j=0; j<NUM_PROBLEMS; j++) {
-                if (currentCorrectSubmissions[i][j]===false && updatedPlayerSubmissions[i][j]===true) {
+                if (currentCorrectSubmissions[i][j] !== updatedPlayerSubmissions[i][j]) {
                     //that means circle to check mark (nothing to correct)!
                     const boxElement = `player${i+1}Box${j+1}`;
-                    document.getElementById(boxElement).innerText = "✔️";
-                    currentCorrectSubmissions[i][j] = true;
+                    let mark = (updatedPlayerSubmissions[i][j] === 1) ? "✔" : "X";
+                    let color = (updatedPlayerSubmissions[i][j] === 1) ? "green" : "red";
+                    let checkMarkMap = new Map(); //the styling definition for a check mark
+                    checkMarkMap.set("color", color);
+                    checkMarkMap.set("font-size", "30px");
+                    document.getElementById(boxElement).innerHTML = innerHtmlStyle(mark, null, checkMarkMap);
+                    currentCorrectSubmissions[i][j] = updatedPlayerSubmissions[i][j];
                 }
+                
             }
         }
     }
