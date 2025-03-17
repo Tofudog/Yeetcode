@@ -2,7 +2,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import connectDB from './config/db.js';
 import gameRoutes from './routes/gameRoutes.js';
-import invitationRoutes from './routes/invitationRoutes.js';
+// import invitationRoutes from './routes/invitationRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 
 const app = express();
@@ -20,7 +20,7 @@ connectDB();
 // Routes
 app.use('/api/users', userRoutes);
 app.use('/api/games', gameRoutes);
-app.use('/api/invitationCodes', invitationRoutes);
+// app.use('/api/invitationCodes', invitationRoutes);
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
