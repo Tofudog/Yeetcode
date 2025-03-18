@@ -11,23 +11,19 @@
 
 <body>
 
-    <div class="outer-border">
+    <div id="join-team-screen" class="screen active">
 
-        <div id="join-team-screen" class="screen active">
+        <button id="back-to-main-screen-from-join" class="back-btn">←</button>
 
-            <button id="back-to-main-screen-from-join" class="back-btn">←</button>
-    
-            <h2>Got a <span class="highlight">team code</span>? Paste it here!</h2>
-    
-            <input type="text" id="teamCodeInput" placeholder="Enter Code Here">
-    
-            <button id="confirm-join" class="btn">Join Team</button>
-    
-        </div>
+        <label>Invitation Code</label>
+        <input type="text" id="teamCodeInput" placeholder="Enter Code" />
 
+        <label>Username</label>
+        <input type="text" id="player2Name" placeholder="Enter Username" />
+
+        <button id="confirm-join" class="btn">Join Team</button>
 
     </div>
-
 
     <script type="module" src="assets/js/popup.js"></script>
 </body>

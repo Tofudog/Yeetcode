@@ -23,7 +23,7 @@
 
   "web_accessible_resources": [
     {
-      "resources": ["Frontend/js/contentScript.js"],
+      "resources": ["Frontend/js/*.js"],
       "matches": ["<all_urls>"]
     }
   ],
