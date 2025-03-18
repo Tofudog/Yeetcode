@@ -7,21 +7,6 @@ import { isValidUser } from "./utils.js";
 const socket = new WebSocket("ws://localhost:3000/ws");
 
 document.addEventListener("DOMContentLoaded", function () {
-    // Only attach event listener if the button exists on the current page
-    let back_to_main_button = document.getElementById("back-to-main-screen");
-    if (back_to_main_button) {
-        back_to_main_button.addEventListener("click", function () {
-            window.location.href = "main-screen.html"; // Navigate back to main screen
-        });
-    }
-
-    let back_to_main_button_from_join = document.getElementById("back-to-main-screen-from-join");
-    if (back_to_main_button_from_join) {
-        back_to_main_button_from_join.addEventListener("click", function () {
-            window.location.href = "main-screen.html"; // Navigate back to main screen
-        });
-    }
-    
     // UI Elements
     const createTeamButton = document.getElementById("create-team-button");
     const joinTeamButton = document.getElementById("join-team-button");
@@ -30,9 +15,16 @@ document.addEventListener("DOMContentLoaded", function () {
     const inviteCodeElement = document.getElementById("inviteCode");
     let player1Input = document.getElementById("player1Name");
     const player2Container = document.getElementById("player2-container");
-    let player2Input = document.getElementById("player2Name") || null;
+    let player2Input = document.getElementById("player2Name");
     const confirmJoinButton = document.getElementById("confirm-join");
 
+    let back_to_main_button_from_join = document.getElementById("back-to-main-screen-from-join");
+    if (back_to_main_button_from_join) {
+        back_to_main_button_from_join.addEventListener("click", function () {
+            window.location.href = "main-screen.html"; // Navigate back to main screen
+        });
+    }
+    
     let gameId;
     let isPlayer2 = false;
 
@@ -214,43 +206,49 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // **Start Game Button**
     if (startGameButton) {
-        startGameButton.addEventListener("click", () => {
-            fetch(`http://localhost:3000/api/games/${gameId}/status`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ status: "in_progress", player_1: player1Input.value.trim() })
-            });
+        startGameButton.addEventListener("click", async () => {
+            try {
+                // Retrieve player names
+                const player1Name = player1Input.value.trim();
+                const player2Name = player2Input.value.trim();
 
-            socket.send(JSON.stringify({ type: "START_GAME", gameId }));
+                // Store in localStorage
+                localStorage.setItem("Player1", player1Name);
+                localStorage.setItem("Player2", player2Name);
 
-            window.location.href = "game-play-screen.html";
-        }); 
-    }
+                // Validate players asynchronously
+                let [validPlayer1, validPlayer2] = await Promise.all([
+                    isValid(player1Name),
+                    isValid(player2Name)
+                ]);
 
-    // TODO: Refactor Duplicate Start Game code
-    let start_game_button = document.getElementById("start-game-button");
-    if (start_game_button) {
-        start_game_button.addEventListener("click", async function () {
-            //When the start button gets clicked on, the backend checks whether
-            //the two inputted users are actually valid.
-            //If a player is invalid, then the text box will notify it.
-            const player1Name = document.getElementById("player1Name").value;
-            const player2Name = document.getElementById("player2Name").value;
-            localStorage.setItem("Player1", player1Name);
-            localStorage.setItem("Player2", player2Name);
-            let validPlayer1 = await isValid(player1Name);
-            let validPlayer2 = await isValid(player2Name);
-            if (validPlayer1 && validPlayer2) {
-                window.location.href = "game-play-screen.html"; // Navigate to Join Team page
-            }
-            else {
-                console.log(`Is ${player1Name} an actual Leetcode user? ${isValid}`);
-                if (!validPlayer1) {
-                    document.getElementById("player1Name").value = `${player1Name} is not a Leetcode username. YEET!`;
+                if (validPlayer1 && validPlayer2) {
+                    // Update game status on the backend
+                    await fetch(`http://localhost:3000/api/games/${gameId}/status`, {
+                        method: "PATCH",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ status: "in_progress", player_1: player1Name })
+                    });
+
+                    // Notify other players via WebSocket
+                    socket.send(JSON.stringify({ type: "START_GAME", gameId }));
+
+                    // Navigate to the gameplay screen
+                    window.location.href = "game-play-screen.html";
+                } else {
+                    // Handle invalid players
+                    console.log(`Is ${player1Name} a valid Leetcode user? ${validPlayer1}`);
+                    console.log(`Is ${player2Name} a valid Leetcode user? ${validPlayer2}`);
+
+                    if (!validPlayer1) {
+                        player1Input.value = `${player1Name} is not a Leetcode username. YEET!`;
+                    }
+                    if (!validPlayer2) {
+                        player2Input.value = `${player2Name} is not a Leetcode username. YEET!`;
+                    }
                 }
-                if (!validPlayer2) {
-                    document.getElementById("player2Name").value = `${player2Name} is not a Leetcode username. YEET!`;
-                }
+            } catch (err) {
+                console.error("Failed to start game:", err);
             }
         });
     }
