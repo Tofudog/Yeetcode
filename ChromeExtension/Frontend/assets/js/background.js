@@ -1,25 +1,24 @@
-chrome.runtime.onInstalled.addListener(() =>  {
-    chrome.sidePanel.setOptions({ path: "Frontend/main-screen.html" })
-    chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true});
+const AI_KEYWORDS = ['chatgpt', 'deepseek']; // AI-related keywords
+
+chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
+  if (!tab.url) return;
+  const url = new URL(tab.url);
+
+  // Check if the domain contains any AI-related keywords
+  const isAIRelatedDomain = AI_KEYWORDS.some(keyword => url.origin.includes(keyword));
+
+  if (isAIRelatedDomain) {
+    // Disable the side panel on AI-related domains
+    await chrome.sidePanel.setOptions({
+      tabId,
+      enabled: false
+    });
+  } else {
+    // Enable the side panel on non-AI domains
+    await chrome.sidePanel.setOptions({
+      tabId,
+      path: 'Frontend/main-screen.html',
+      enabled: true
+    });
+  }
 });
-
-chrome.tabs.onUpdated.addListener((tabId, tab) => {
-    console.log("\n\nTesting: BACKGROUND LOGS!!!\n\n")
-    chrome.tabs.sendMessage(tabId, {
-        message: "connected"
-    })
-  })
-
-    //anti cheat functions
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-    if(chrome.runtime.lastError) {
-        console.error(chrome.runtime.lastError.message);
-        return;
-    }
-
-    console.log("THIS IS THE TAB URL: " + tab.url)
-    if (tab.url && tab.url.includes("https://chatgpt.com/")) {
-        chrome.tabs.remove(tabId); 
-        console.log("Chatgpt is not allowed while running our extension.")
-    }
-})
