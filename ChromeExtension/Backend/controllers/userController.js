@@ -1,5 +1,5 @@
 import User from '../models/userModel.js';
-import isValid from '../utils/validateUser.js';
+// import isValid from '../utils/validateUser.js';
 
 // Create a new user
 const createUser = async (req, res) => {
