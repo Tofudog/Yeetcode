@@ -53,7 +53,7 @@ app.post('/api/recentSubmission', async (req, res) => {
       const data = await response.json();
       console.log("this is submission details", data.data.recentSubmissionList)
       if (data.data && data.data.recentSubmissionList) {
-          return res.json(data.data.recentSubmissionList);
+          return res.json(data);
       } else {
           res.status(404).json({ error: "Submission details not found or error retrieving data" });
       }

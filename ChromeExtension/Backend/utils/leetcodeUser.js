@@ -1,27 +1,14 @@
-const URL_TEMPLATE = "https://leetcode-api-faisalshohag.vercel.app";
+import { userRecentSubmission } from "./userRecentSubmission.js";
 
-async function getUserData(user, params) {
-    let urlUser = `${URL_TEMPLATE}/${user}/`;
-    let userResponse = null;
-    let response = await fetch(urlUser);
-    if (response.ok) {
-        userResponse = await response.json();
-    }
-    else {
-        throw new Error(`This network was not found: ${URL_TEMPLATE}`);
-    }
+const SUBMISSION_PARAM = "recentSubmissions";
 
-    const userData = new Map();
-    params.forEach(PARAM => {
-        if (PARAM in userResponse) {
-            userData.set(PARAM, userResponse[PARAM]);
-        }
-        else {
-            console.log(`${PARAM} is not in the user response!`);
-        }
-    });
-    
-    return userData;
+async function getUserData(user) {
+    const recentSubmission = await userRecentSubmission(user, 1)[0];
+    if (!(SUBMISSION_PARAM in recentSubmission)) {
+        console.log(`${SUBMISSION_PARAM} is not in the user response!`);
+        return null;
+    }
+    return recentSubmission;
 }
 
 export default getUserData;

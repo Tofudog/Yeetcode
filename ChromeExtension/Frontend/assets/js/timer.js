@@ -1,7 +1,15 @@
 import updateSubmission from "../../../Backend/utils/gameLoop.js";
 
+/*
+TypeError: Failed to fetch
+    at userRecentSubmission (userRecentSubmission.js:6:30)
+    at getUserData (leetcodeUser.js:6:36)
+    at updateSubmission (gameLoop.js:29:34)
+    at timer.js:75:48
+*/
+
 const CHECKING_IF_PASSED = true; //Can change this to true if want to check a submission passed
-const CYCLE_AMOUNT = 15; //Number of seconds per API Call
+const CYCLE_AMOUNT = 3; //Number of seconds per API Call
 let PLAYER1 = ""; //both players will be defined by the user
 let PLAYER2 = "";
 const PROBLEM_LIST = [
