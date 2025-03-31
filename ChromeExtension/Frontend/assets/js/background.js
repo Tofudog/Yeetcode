@@ -1,4 +1,5 @@
-const socket = new WebSocket("ws://localhost:3000/ws");
+import { BACKEND_API } from "./config.js";
+const socket = new WebSocket(BACKEND_API.replace(/^http/, "ws") + "/ws");
 
 socket.onopen = () => {
     console.log("WebSocket connected.");

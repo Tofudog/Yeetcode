@@ -1,6 +1,15 @@
+import { BACKEND_API } from "./config.js";
 import generateRandomCode from "./code_generator.js";
 
-const socket = new WebSocket("ws://localhost:3000/ws");
+const socket = new WebSocket(BACKEND_API.replace(/^http/, "ws") + "/ws");
+function waitForSocketConnection(socket, callback) {
+    const interval = setInterval(() => {
+        if (socket.readyState === WebSocket.OPEN) {
+            clearInterval(interval);
+            callback();
+        }
+    }, 50);
+}
 
 document.addEventListener("DOMContentLoaded", function () {
     // UI Elements
@@ -15,6 +24,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const confirmJoinButton = document.getElementById("confirm-join");
     let back_to_main_button = document.getElementById("back-to-main-screen");
     let back_to_main_button_from_join = document.getElementById("back-to-main-screen-from-join");
+    const toggleCheckbox = document.getElementById("toggle-note-checkbox");
+    const noteContent = document.getElementById("note-content");
 
     // Navigate back to main screen
     if (back_to_main_button) {
@@ -50,7 +61,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }            
             const pollInterval = setInterval(() => {
-                fetch(`http://localhost:3000/api/games/${gameId}`)
+                fetch(`${BACKEND_API}/api/games/${gameId}`)
                     .then(response => response.json())
                     .then(game => {
                         console.log("Game Status:", game.status);
@@ -93,7 +104,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (!gameId) {
                 // Create game on backend
-                fetch("http://localhost:3000/api/games", {
+                fetch(`${BACKEND_API}/api/games`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ invitation_code: code, username: null })
@@ -102,7 +113,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 .then(data => {
                     gameId = data._id;
                     chrome.storage.local.set({ gameId });
-                    socket.send(JSON.stringify({ type: "CREATE_GAME", gameId, invitation_code: code }));
+                    waitForSocketConnection(socket, () => {
+                        socket.send(JSON.stringify({ type: "CREATE_GAME", gameId, invitation_code: code }));
+                    });
+                    
                 })
                 .catch(error => console.error("Error creating game:", error));
             }
@@ -132,7 +146,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const codeInput = document.getElementById("teamCodeInput").value.trim();
             const player2Name = document.getElementById("player2Name").value.trim();
 
-            fetch("http://localhost:3000/api/games/join", {
+            fetch(`${BACKEND_API}/api/games/join`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ invitation_code: codeInput, username: player2Name })
@@ -226,7 +240,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 if (validPlayer1 && validPlayer2) {
                     // Update game status on the backend
-                    await fetch(`http://localhost:3000/api/games/${gameId}/status`, {
+                    await fetch(`${BACKEND_API}/api/games/${gameId}/status`, {
                         method: "PATCH",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ status: "in_progress", player_1: player1Name })
@@ -263,9 +277,6 @@ document.addEventListener("DOMContentLoaded", function () {
         //to the list of currently available games
     }
 
-    const toggleCheckbox = document.getElementById("toggle-note-checkbox");
-    const noteContent = document.getElementById("note-content");
-
     function adjustNoteHeight() {
         if (toggleCheckbox.checked) {
             let availableHeight = window.innerHeight - noteContent.offsetTop - 20; // Calculate available height in the side panel
@@ -275,8 +286,10 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // Adjust height when checkbox state changes
-    toggleCheckbox.addEventListener("change", adjustNoteHeight);
+    if(toggleCheckbox){
+        // Adjust height when checkbox state changes
+        toggleCheckbox.addEventListener("change", adjustNoteHeight);
+    }
 
     // Update height when the window is resized
     window.addEventListener("resize", adjustNoteHeight);
