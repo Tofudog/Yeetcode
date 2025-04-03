@@ -10,6 +10,13 @@ chrome.tabs.onUpdated.addListener((tabId, tab) => {
     })
   })
 
+//Logic for when leetcode submit button is clicked.
+chrome.runtime.onMessage.addEventListener((request, sender, sendResponse) => {
+    if(request.action === "leetcodesubmitclicked") {
+        chrome.runtime.sendMessage({action: "triggerUserSubmissionAPICall"});
+    }
+})
+
 //     //anti cheat functions
 // chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 //     if(chrome.runtime.lastError) {

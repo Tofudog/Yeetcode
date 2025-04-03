@@ -1,9 +1,11 @@
 // Leetcode user API functionality
 //import getUserData from "./../../../Backend/leetcode_user.js";
-import { validateUser } from "./../../../Backend/utils/validateUserGraphQL.js";
+// import { validateUser } from "./../../../Backend/utils/leetcodeGraphQLQueries.js";
 import generateRandomCode from "../../../Backend/utils/code_generator.js";
+import {validateUser} from "../api/graphql_apis.js";
+import { userRecentSubmissions } from "../api/graphql_apis.js";
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
 
     // Only attach event listener if the button exists on the current page
     let back_to_main_button = document.getElementById("back-to-main-screen");

@@ -12,7 +12,7 @@ const app = express();
 app.get("/", (_, res) => res.json({ message: "Welcome to Yeetcode API" }));
 
 // Port
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 2000;
 
 // Middleware
 app.use(bodyParser.json());
@@ -38,7 +38,7 @@ app.use('/api/invitationCodes', invitationRoutes);
 app.post('/api/userRecentSubmissions', async (req, res) => {
   const { username, limit } = req.body
   if (!username || !limit) {
-      return res.status(400).json({ error: "username and limit is required" });
+      return res.status(400).json({ error: "username and limit is required3" });
   }
 
   try {
