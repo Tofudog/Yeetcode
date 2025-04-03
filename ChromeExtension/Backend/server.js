@@ -31,7 +31,7 @@ app.use('/api/invitationCodes', invitationRoutes);
  * 
  * @return A dictionary of submisisons arrays.
  *  
- * submissionDict[index] has three fields: title, timestamp, and stauts.
+ * submissionDict[index] has three fields: title, timestamp, and status.
  * submissionDict starts at index 0, submissionDict[0].title will get the title for the user's (most recent) submission.
  *
  */

@@ -1,4 +1,5 @@
 import updateSubmission from "../../../Backend/utils/gameLoop.js";
+import { userRecentSubmissions } from "../api/graphql_apis.js";
 
 const CHECKING_IF_PASSED = true; //Can change this to true if want to check a submission passed
 const CYCLE_AMOUNT = 15; //Number of seconds per API Call
@@ -70,20 +71,21 @@ var intervalTimer = setInterval(async function() {
     numHours = nextTime[0];
     numMinutes = nextTime[1];
     numSeconds = nextTime[2];
-    if (numSeconds % CYCLE_AMOUNT === 0 && CHECKING_IF_PASSED) {
-        //then check if submission has changed (this will be inefficient, but for now do this)
-        const updatedPlayerSubmissions = await updateSubmission(PLAYER1, PLAYER2, PROBLEM_LIST);
-        for (var i=0; i<NUM_USERS; i++) {
-            for (var j=0; j<NUM_PROBLEMS; j++) {
-                if (currentCorrectSubmissions[i][j]===false && updatedPlayerSubmissions[i][j]===true) {
-                    //that means circle to check mark (nothing to correct)!
-                    const boxElement = `player${i+1}Box${j+1}`;
-                    document.getElementById(boxElement).innerText = "✔️";
-                    currentCorrectSubmissions[i][j] = true;
+    chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
+        if(request.action === "triggerUserSubmissionAPICall") {
+            const updatedPlayerSubmissions = await updateSubmission(PLAYER1, PLAYER2, PROBLEM_LIST);
+            for (var i=0; i<NUM_USERS; i++) {
+                for (var j=0; j<NUM_PROBLEMS; j++) {
+                    if (currentCorrectSubmissions[i][j]===false && updatedPlayerSubmissions[i][j]===true) {
+                        //that means circle to check mark (nothing to correct)!
+                        const boxElement = `player${i+1}Box${j+1}`;
+                        document.getElementById(boxElement).innerText = "✔️";
+                        currentCorrectSubmissions[i][j] = true;
+                    }
                 }
             }
         }
-    }
+    })
     if (numHours === 0 && numMinutes === 0 && numSeconds === 0) {
         //switch to game over
         window.location.href = gameOverPage;
