@@ -1,4 +1,4 @@
-import { BACKEND_API } from "./config.js";
+const BACKEND_API = "https://yeetcode-1.onrender.com";
 import generateRandomCode from "./code_generator.js";
 
 const socket = new WebSocket(BACKEND_API.replace(/^http/, "ws") + "/ws");
