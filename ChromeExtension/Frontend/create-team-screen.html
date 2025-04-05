@@ -11,32 +11,31 @@
 
 <body>
 
-    <div class="outer-border">
+    <div id="create-team-screen" class="screen active">
 
-        <div id="create-team-screen" class="screen active">
+        <button id="back-to-main-screen" class="back-btn">←</button>
+        <h2>Invite Code: <span id="inviteCode" class="invite-code">or4L</span>
+        <button id="copyCode" class="copy-btn">Copy Code</button></h2>
 
-            <button id="back-to-main-screen" class="back-btn">←</button>
-            <h2>Invite Code: <span id="inviteCode" class="invite-code">or4L</span></h2>
-            
-            <div class="input-container">
-                <label for="player1Name">Player 1</label>
-                <input type="text" id="player1Name" placeholder="Player 1">
-            </div>
-    
-            <div class="input-container">
-                <label for="player2Name">Player 2</label>
-                <input type="text" id="player2Name" placeholder="Player 2">
-            </div>
-    
-            <button id="start-game-button" class="btn">START</button>
-    
+        <div class="input-container">
+            <label for="player1Name">Player 1</label>
+            <input type="text" id="player1Name" placeholder="Player 1">
+        </div>   
+        
+        <div class="input-container" id="player2-container" style="display: none;">
+            <label for="player2Name">Player 2</label>
+            <input type="text" id="player2Name" placeholder="Waiting for Player 2..." disabled>
         </div>
-    
-    
-        <script type="module" src="assets/js/popup.js"></script>
+
+        <p id="waitingMsg">Waiting for Player 2 to join...</p>
+
+        <button id="start-game-button" class="btn" onclick="window.location.href='game-setup-screen.html'">START</button>
+        
 
     </div>
 
+
+    <script type="module" src="assets/js/popup.js"></script>
 </body>
 
 </html>

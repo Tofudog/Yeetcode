@@ -1,76 +1,144 @@
 import Game from '../models/gameModel.js';
-import User from '../models/userModel.js';
-import InvitationCode from '../models/InvitationCodeModel.js';
+// import { v4 as uuidv4 } from 'uuid';
 
 // Get all games
-const getAllGames = async (req, res) => {
+export const getAllGames = async (req, res) => {
   try {
-    const games = await Game.find().populate('player_1_id player_2_id invitation_code_id');
+    const games = await Game.find(); // Removed .populate()
     res.status(200).json(games);
   } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
-
-// Get one game by ID
-const getGameById = async (req, res) => {
-  try {
-    const game = await Game.findById(req.params.id).populate('player_1_id player_2_id invitation_code_id');
-    if (!game) return res.status(404).json({ message: 'Game not found' });
-
-    res.status(200).json(game);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("Error fetching games:", err);
+    res.status(500).json({ message: "Failed to retrieve games", error: err.message });
   }
 };
 
 // Create a new game
-const createGame = async (req, res) => {
-  const { player_1_id, player_2_id, invitation_code } = req.body;
-
+export const createGame = async (req, res) => {
   try {
-    const invitation = await InvitationCode.findOne({ invitation_code, status: 'active' });
-    if (!invitation) {
-      return res.status(400).json({ message: 'Invalid or inactive invitation code' });
+    const { invitation_code, username } = req.body;
+
+    if (!invitation_code) {
+      return res.status(400).json({ message: 'invitation_code is required' });
+    }
+
+    // Check if invitation_code already exists
+    const existingGame = await Game.findOne({ invitation_code });
+    if (existingGame) {
+      return res.status(400).json({ message: 'Invitation code already in use' });
     }
 
     const newGame = new Game({
-      player_1_id,
-      player_2_id,
-      invitation_code_id: invitation._id
+      invitation_code,
+      player_1: username
     });
 
     await newGame.save();
-
-    invitation.status = 'inactive';
-    await invitation.save();
-
     res.status(201).json(newGame);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+  } catch (error) {
+    res.status(500).json({ message: 'Error creating game', error });
   }
 };
 
-// Delete one game by ID
-const deleteGameById = async (req, res) => {
+// Join a game
+export const joinGame = async (req, res) => {
   try {
-    const deletedGame = await Game.findByIdAndDelete(req.params.id);
-    if (!deletedGame) return res.status(404).json({ message: 'Game not found' });
+    const { invitation_code, username } = req.body;
 
-    res.status(200).json({ message: 'Game deleted successfully' });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+    if (!invitation_code) {
+      return res.status(400).json({ message: 'invitation_code is required' });
+    }
+
+    const game = await Game.findOne({ invitation_code });
+
+    if (!game) {
+      return res.status(400).json({ message: 'Invalid invitation code' });
+    }
+
+    if (game.player_2) {
+      return res.status(400).json({ message: 'Player 2 already joined' });
+    }
+
+    if (game.player_1 === username) {
+      return res.status(400).json({ message: 'You are already in this game as Player 1' });
+    }
+
+    game.player_2 = username;
+    game.status = 'paired';
+    await game.save();
+
+    res.status(200).json(game);
+  } catch (error) {
+    res.status(500).json({ message: 'Error joining game', error });
+  }
+};
+
+// Update game
+export const updateGame = async (req, res) => {
+  try {
+    const gameId = req.params.id;
+    const { player_1, player_2, invitation_code, status } = req.body;
+
+    const game = await Game.findById(gameId);
+    if (!game) {
+      return res.status(404).json({ message: 'Game not found' });
+    }
+
+    // Merge any fields provided in the request
+    if (player_1 !== undefined) game.player_1 = player_1;
+    if (player_2 !== undefined) game.player_2 = player_2;
+    if (invitation_code !== undefined) game.invitation_code = invitation_code;
+    if (status !== undefined) game.status = status;
+
+    await game.save();
+    res.status(200).json(game);
+  } catch (error) {
+    console.error('Error updating game:', error);
+    res.status(500).json({ message: 'Failed to update game', error });
+  }
+};
+
+
+// Update game status
+export const updateGameStatus = async (req, res) => {
+  try {
+    const { status } = req.body; // Expect new status in body
+    const game = await Game.findById(req.params.id);
+
+    if (!game) {
+      return res.status(404).json({ message: 'Game not found' });
+    }
+
+    game.status = status; // Update the game status
+    await game.save();
+    res.status(200).json(game);
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating game status' });
+  }
+};
+
+// Get a game by invitation code
+export const getGameByInvitationCode = async (req, res) => {
+  try {
+    const { invitation_code_id } = req.params; // Get the invitation code from URL params
+    const game = await Game.findOne({ invitation_code_id }).populate('player_1 player_2');
+
+    if (!game) {
+      return res.status(404).json({ message: 'Game not found' });
+    }
+
+    res.status(200).json(game); // Return the game details
+  } catch (error) {
+    res.status(500).json({ message: 'Error retrieving game by invitation code' });
   }
 };
 
 // Delete all games
-const deleteAllGames = async (req, res) => {
+export const deleteAllGames = async (req, res) => {
   try {
-    await Game.deleteMany();
-    res.status(200).json({ message: 'All games deleted successfully' });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+    const result = await Game.deleteMany({});
+    res.status(200).json({ message: `Deleted ${result.deletedCount} games successfully.` });
+  } catch (error) {
+    console.error("Error deleting games:", error);
+    res.status(500).json({ message: "Failed to delete games", error: error.message });
   }
 };
-
-export { getAllGames, getGameById, createGame, deleteGameById, deleteAllGames };

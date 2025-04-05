@@ -47,7 +47,6 @@ function handleSubmitClick() {
     console.log('Yeetcode Content Script: Submit button CLICKED!');
     // This sends a message to the popup.js script
     chrome.runtime.sendMessage({action: "leetcodesubmitclicked", message: "Submit button clicked"});
-    
 }
 
 // --- Main Execution Logic ---

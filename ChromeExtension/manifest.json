@@ -3,13 +3,14 @@
   "name": "Yeetcode",
   "version": "1.0",
   "description": "Yeetcode extension for cs geeks",
-  "permissions": ["storage", "tabs", "sidePanel", "windows"],
+  "permissions": ["storage", "tabs", "sidePanel", "windows", "webNavigation", "notifications"],
   "host_permissions": ["<all_urls>"],
   "side_panel": {
     "default_path": "Frontend/main-screen.html"
   },
   "background": {
-    "service_worker": "Frontend/assets/js/background.js"
+    "service_worker": "Frontend/assets/js/background.js",
+    "type": "module"
   },
   "content_scripts": [
     {
@@ -23,12 +24,11 @@
 
   "web_accessible_resources": [
     {
-      "resources": ["Frontend/js/contentScript.js"],
+      "resources": ["Frontend/js/*.js"],
       "matches": ["<all_urls>"]
     }
   ],
   "content_security_policy": {
     "extension_pages": "script-src 'self'"
   }
-
 }

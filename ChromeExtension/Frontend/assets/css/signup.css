@@ -1,0 +1,106 @@
+body {
+    background-color: #eef2ff;
+}
+
+img {
+    width: 32%;
+}
+
+input {
+    height: 27px;
+    width: 275px;
+    border-color: gray;
+    border-radius: 5px;
+}
+
+button {
+    background-color: #eab764;
+    color: white;
+    border: none;
+    border-radius: 22px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: box-shadow 0.3s ease; /* Smooth transition for the glow effect */
+
+    width: 75px;
+    height: 32px;
+}
+
+button:hover {
+    background-color: #e6c48c;
+    box-shadow: 0 0 5px rgba(237, 169, 58, 0.8); /* Glow effect */
+    transform: scale(1.05); /* Slightly increase the size */
+}
+
+input::placeholder {
+    color: gray;
+    opacity: 0.7;
+}
+
+input:focus {
+    color: rgb(0, 0, 0);
+}
+
+a {
+    color: black;
+}
+
+
+.center-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding-top: 10px;
+}
+
+.side-space {
+    padding-left: 25px;
+}
+
+.side {
+    padding: right;
+}
+
+.login-input {
+    width: 150px;
+    margin-top: 18px;
+}
+
+.login-button {
+    width: 98px;
+    height: 40px;
+    margin: 25px;
+}
+
+.signup-button {
+    margin-left: 210px;
+}
+
+.side-by-side {
+    display: flex;
+    margin-right: 10px;
+}
+
+.list-class {
+    font-size: medium;
+    line-height: 25px;
+}
+
+#middle-box {
+    margin-left: 7px;
+    margin-top: 15px;
+    width: 330px;
+    height: 635px;
+    background-color: rgb(255, 255, 255);
+    border-radius: 2%;
+}
+
+#middle-box-login {
+    margin-left: 7px;
+    margin-top: 15px;
+    width: 330px;
+    height: 480px;
+    background-color: rgb(255, 255, 255);
+    border-radius: 2%;
+}

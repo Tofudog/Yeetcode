@@ -1,18 +1,10 @@
 import User from '../models/userModel.js';
-import { validateUser } from '../utils/leetcodeGraphQLQueries.js';
 
 // Create a new user
 const createUser = async (req, res) => {
   const { username } = req.body;
 
   try {
-    // Validate Username
-    const validUser = await validateUser(username);
-    console.log(username)
-    if (!validUser) {
-        return res.status(400).json({ message: 'Invalid LeetCode username.' });
-    }
-
     const newUser = new User({ username });
     await newUser.save();
     res.status(201).json(newUser);

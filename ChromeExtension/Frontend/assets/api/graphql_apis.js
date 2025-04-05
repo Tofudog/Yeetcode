@@ -2,7 +2,7 @@ export const userRecentSubmissions = async (username, limit) =>{
     try{ 
         const payload = { username, limit};
 
-        const response = await fetch("http://localhost:2000/api/userRecentSubmissions", {
+        const response = await fetch("http://localhost:3000/api/userRecentSubmissions", {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json', 
@@ -21,8 +21,8 @@ export const userRecentSubmissions = async (username, limit) =>{
 export const validateUser = async (username) => {
     try {
         const payload = {username};
-        
-        const response = await fetch('http://localhost:2000/api/validateUser', {
+
+        const response = await fetch('http://localhost:3000/api/validateUser', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

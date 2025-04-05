@@ -1,0 +1,229 @@
+/* Base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    background-color: #f7f8fa;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .container {
+    width: 100%;
+    max-width: 20rem;
+    padding: 1rem;
+  }
+  
+  .game-setup-card {
+    background-color: white;
+    border-radius: 1.2rem;
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1),
+                0 4px 6px -2px rgba(0,0,0,0.05);
+    padding: 1.5rem;
+  }
+  
+  /* Adjust spacing since the title is removed */
+  .section-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    margin-top: 0.001rem;  /* Very small top margin */
+  }
+  
+  .section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .section-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+  }
+  
+  /* Difficulty selector */
+  .difficulty-selector {
+    display: flex;
+    background-color: #f2f2f2;
+    border-radius: 9999px;
+    padding: 0.25rem;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1),
+                0 2px 4px -1px rgba(0,0,0,0.06);
+  }
+  
+  .difficulty-btn {
+    flex: 1;
+    padding: 0.5rem 0.75rem;
+    border-radius: 9999px;
+    text-align: center;
+    font-weight: 500;
+    font-size: 1rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #d9d9d9;
+    transition: color 0.2s;
+  }
+  
+  .difficulty-btn.easy.active {
+    color: #00af9b;
+  }
+  
+  .difficulty-btn.medium.active {
+    color: #ffb800;
+  }
+  
+  .difficulty-btn.hard.active {
+    color: #d93a00;
+  }
+  
+  /* iOS Picker */
+  .ios-picker-container {
+    position: relative;
+    height: 150px;
+    background-color: #f2f2f2;
+    border-radius: 1.2rem;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1),
+                0 2px 4px -1px rgba(0,0,0,0.06);
+  }
+  
+  /* Selection Indicator (semi-transparent) */
+  .selection-indicator {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 35px;
+    background-color: rgba(217,217,217,0.4);
+    z-index: 3;
+  }
+  
+  .selection-arrow {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+  }
+  
+  .ios-picker {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    scroll-snap-type: y mandatory;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    z-index: 0;
+  }
+  
+  .ios-picker::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .ios-picker::-webkit-scrollbar-thumb {
+    background: transparent !important;
+  }
+  
+  .ios-picker::-webkit-scrollbar-track {
+    background: transparent !important;
+  }
+  
+  .picker-items {
+    position: relative;
+    z-index: 2;
+    padding-top: 60px;
+    padding-bottom: 60px;
+  }
+  
+  .picker-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 35px;
+    font-size: 1rem;
+    scroll-snap-align: center;
+    color: #000;
+  }
+  
+  .gradient-top {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: linear-gradient(to bottom, #f2f2f2, transparent);
+    pointer-events: none;
+    z-index: 1;
+  }
+  
+  .gradient-bottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: linear-gradient(to top, #f2f2f2, transparent);
+    pointer-events: none;
+    z-index: 1;
+  }
+  
+  /* Battle Type selector */
+  .battle-type-selector {
+    display: flex;
+    background-color: #f2f2f2;
+    border-radius: 9999px;
+    padding: 0.25rem;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1),
+                0 2px 4px -1px rgba(0,0,0,0.06);
+  }
+  
+  .battle-type-btn {
+    flex: 1;
+    padding: 0.5rem 0.75rem;
+    border-radius: 9999px;
+    text-align: center;
+    font-weight: 500;
+    font-size: 1rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .battle-type-btn.active {
+    background-color: white;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
+  }
+  
+  /* Start Button */
+  .start-button-container {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .start-button {
+    background-color: #f6c261;
+    color: white;
+    font-weight: 700;
+    font-size: 1.25rem;
+    padding: 0.75rem 3rem;
+    border-radius: 9999px;
+    border: none;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1),
+                0 2px 4px -1px rgba(0,0,0,0.06);
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .start-button:hover {
+    background-color: #f5b951;
+  }

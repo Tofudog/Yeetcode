@@ -33,16 +33,6 @@ body {
     background-color: white;
 }
 
-/* Input Styling */
-.game-table input {
-    width: 100px;
-    padding: 5px;
-    text-align: center;
-    border: none;
-    font-size: 16px;
-    font-weight: bold;
-}
-
 /* Challenge Completion Styling */
 td.player1, td.player2 {
     font-size: 24px;
@@ -54,25 +44,68 @@ td.player1:hover, td.player2:hover {
     transform: scale(1.1);
 }
 
+/* Problem Link */
+.problem-link {
+    text-decoration: none;
+    color: #1e293b;
+    font-size: 15px;
+}
+
 /* Bottom Section (Timer & Scores) */
 .bottom-section {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
     margin-top: 15px;
     padding: 10px;
+    background-color: #f8fafc;
+    border-radius: 10px;
 }
 
 /* Timer */
 .timer {
     background: #4a5d9b;
     color: white;
-    border-radius: 20px;
-    padding: 10px 20px;
-    font-size: 18px;
+    border-radius: 16px;
+    padding: 8px 12px;
+    font-size: 16px;
+    min-width: 70px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* Scores Container */
+.scores-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+/* Player Score */
+.player-score {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    padding: 6px 12px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 40px;
+    grid-column: span 1;
+}
+
+.player-score:first-child {
+    grid-column: 2;
+}
+
+.player-score:last-child {
+    grid-column: 3;
 }
 
 /* Score Boxes */
 .score {
     font-size: 24px;
     font-weight: bold;
+    color: #1e293b;
+    text-align: center;
 }

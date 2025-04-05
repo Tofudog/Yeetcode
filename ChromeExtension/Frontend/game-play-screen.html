@@ -7,9 +7,7 @@
     <link rel="stylesheet" href="assets/css/game_play_styles.css">
 </head>
 <body>
-
     <div class="outer-border">
-
         <div class="game-container">
             <table class="game-table">
                 <thead>
@@ -20,34 +18,25 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td><a href="https://leetcode.com/problems/two-sum/description/" target="_blank">Challenge 1</a></td>
-                        <td id="player1Box1" class="player1">🟡</td>
-                        <td id="player2Box1" class="player2">🟡</td>
-                    </tr>
-                    <tr>
-                        <td><a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank">Challenge 2</a></td>
-                        <td id="player1Box2" class="player1">🟡</td>
-                        <td id="player2Box2" class="player2">🟡</td>
-                    </tr>
-                    <tr>
-                        <td><a href="https://leetcode.com/problems/recover-a-tree-from-preorder-traversal/description/?envType=daily-question&envId=2025-02-22" target="_blank">Challenge 3</a></td>
-                        <td id="player1Box3" class="player1">🟡</td>
-                        <td id="player2Box3" class="player2">🟡</td>
-                    </tr>
+                    <!-- Problems will be dynamically inserted here -->
                 </tbody>
             </table>
-    
+     
             <div class="bottom-section">
                 <div class="timer" id="timerText">1:00:00</div>
-                <div class="score" id="player1-score">0</div>
-                <div class="score" id="player2-score">0</div>
+                <div class="scores-container">
+                    <div class="player-score">
+                        <div class="score" id="player1-score">0</div>
+                    </div>
+                    <div class="player-score">
+                        <div class="score" id="player2-score">0</div>
+                    </div>
+                </div>
             </div>
+     
+            <script type="module" src="assets/js/timer.js"></script>
+            <script src="assets/js/game_play.js"></script>
         </div>
-    
-        <script type="module" src="assets/js/timer.js"></script>
-
     </div>
-    
 </body>
 </html>

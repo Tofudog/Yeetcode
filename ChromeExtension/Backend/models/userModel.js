@@ -12,7 +12,11 @@ const UserSchema = new mongoose.Schema({
   gamesPlayed: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Game'
-  }]
+  }],
+  // elo: {
+  //   type: Float32Array,
+  //   default:
+  // }
 });
 
 const User = mongoose.model('User', UserSchema);
