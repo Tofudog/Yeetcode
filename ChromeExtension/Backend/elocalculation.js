@@ -1,53 +1,72 @@
+/**
+ * Player class implementing an enhanced ELO rating system with multiple factors
+ * for competitive programming games. The system considers:
+ * - Question completion rate
+ * - Problem difficulty
+ * - Time taken
+ * - Player inactivity
+ * - Rating deviation (RD) for volatility
+ */
 class Player {
   constructor(elo = 1500, rd = 50) {
-      this.elo = elo;
-      this.rd = rd;
-      this.gamesPlayed = 0;
-      this.lastActive = Date.now();
+      this.elo = elo;        // Base ELO rating (default 1500)
+      this.rd = rd;          // Rating Deviation (default 50)
+      this.gamesPlayed = 0;  // Track number of games played
+      this.lastActive = Date.now();  // Last active timestamp
   }
 
   expectedScore(opponentElo) {
       return this.elo;
   }
   
+  /**
+   * Updates player rating based on game results and performance factors
+   * @param {number} result - 1 for win, 0 for loss
+   * @param {number} hoursInactive - Hours since last activity
+   * @param {number} questions - Total questions in the game
+   * @param {number} questionsSolved - Number of questions solved
+   * @param {string} difficulty - Problem difficulty level ('easy', 'medium', 'hard')
+   * @param {number} time - Time taken in minutes
+   */
   updateRating(result, hoursInactive, questions, questionsSolved, difficulty, time) {
+      // RD sequence decreases as player gains experience
       const rdSequence = [20, 15, 12, 9, 6, 4, 3, 2, 1];
       let index = Math.min(this.gamesPlayed, rdSequence.length - 1);
       this.rd = rdSequence[index];
       
-      // Question factor calculation
+      // Question factor: Penalizes incomplete solutions
       let questionFactor = 1.0;
       if (result === 0) { // Player lost
         let unansweredQuestions = questions - questionsSolved;
         if (questionsSolved === 0) {
-          questionFactor = 1.2;
+          questionFactor = 1.2;  // Maximum penalty for no solutions
         } else if (questionsSolved === unansweredQuestions) {
-          questionFactor = 0.8;
+          questionFactor = 0.8;  // Reduced penalty for solving all questions
         } else {
-          questionFactor = 1 + (unansweredQuestions / questions) * 0.5; // Scaling factor
+          questionFactor = 1 + (unansweredQuestions / questions) * 0.5; // Proportional penalty
         }
       }
       
-      // Difficulty factor calculation
+      // Difficulty factor: Rewards solving harder problems
       let difficultyFactor = 1.0;
       if (difficulty === "easy") {
-        difficultyFactor = 0.8;
+        difficultyFactor = 0.8;    // Reduced impact for easy problems
       } else if (difficulty === "medium") {
-        difficultyFactor = 1.0;
+        difficultyFactor = 1.0;    // Standard impact for medium problems
       } else if (difficulty === "hard") {
-        difficultyFactor = 1.2;
+        difficultyFactor = 1.2;    // Increased impact for hard problems
       }
       
-      // Time factor calculation
-      let timeFactor = 0.5;
+      // Time factor: Penalizes slower solutions
+      let timeFactor = 0.5;  // Base time factor
       if (time > 5) {
         // For every 5 minutes above 5, add 0.05 to the time factor, up to 120 minutes
-        let additionalTime = Math.min(time - 5, 115); // Cap at 120 minutes (115 additional minutes)
+        let additionalTime = Math.min(time - 5, 115); // Cap at 120 minutes
         let additionalFactor = (additionalTime / 5) * 0.05;
         timeFactor += additionalFactor;
       }
       
-      // Calculate rating change with all factors
+      // Calculate final rating change with all factors
       let ratingChange = Math.round(
         this.rd * 15 * (result === 1 ? 1 : -1) * questionFactor * difficultyFactor * timeFactor
       );
@@ -58,14 +77,22 @@ class Player {
       this.handleInactivity(hoursInactive);
     }
   
+  /**
+   * Handles player inactivity by adjusting RD
+   * @param {number} hoursInactive - Hours since last activity
+   */
   handleInactivity(hoursInactive) {
       if (hoursInactive > 0) {
           let weeksInactive = Math.floor(hoursInactive / (7 * 24));
-          this.rd = Math.min(50, this.rd + 3 * weeksInactive);
+          this.rd = Math.min(50, this.rd + 3 * weeksInactive);  // Increase RD by 3 per week inactive
       }
   }    
 }
 
+/**
+ * Simulation function to test the ELO rating system
+ * Creates two players and simulates 10 games with random results
+ */
 function simulate() {
   let player1 = new Player(1500, 20);
   let player2 = new Player(1500, 20);
