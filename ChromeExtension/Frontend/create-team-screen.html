@@ -5,34 +5,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- reactive resizing based on user's device -->
-    <title>create team screen</title>
+    <title>Create Team</title>
     <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 
 <body>
 
-    <div id="create-team-screen" class="screen active">
+<div id="create-team-screen" class="screen active">
+    <button id="back-to-main-screen" class="back-btn">←</button>
+    <h2>Invite Code: <span id="inviteCode" class="invite-code"></span>
+    <button id="copyCode" class="copy-btn">Copy Code</button></h2>
 
-        <button id="back-to-main-screen" class="back-btn">←</button>
-        <h2>Invite Code: <span id="inviteCode" class="invite-code">or4L</span>
-        <button id="copyCode" class="copy-btn">Copy Code</button></h2>
-
-        <div class="input-container">
-            <label for="player1Name">Player 1</label>
-            <input type="text" id="player1Name" placeholder="Player 1">
-        </div>   
-        
-        <div class="input-container" id="player2-container" style="display: none;">
-            <label for="player2Name">Player 2</label>
-            <input type="text" id="player2Name" placeholder="Waiting for Player 2..." disabled>
-        </div>
-
-        <p id="waitingMsg">Waiting for Player 2 to join...</p>
-
-        <button id="start-game-button" class="btn" onclick="window.location.href='game-setup-screen.html'">START</button>
-        
-
+    <div class="player-info">
+        <label>Player 1</label>
+        <div id="player1Name" class="username-display"></div>
+    </div>   
+    
+    <div class="player-info" id="player2-container" style="display: none;">
+        <label>Player 2</label>
+        <div id="player2Name" class="username-display"></div>
     </div>
+
+    <p id="waitingMsg">Waiting for Player 2 to join...</p>
+
+    <button id="start-game-button" class="btn" disabled>START</button>
+</div>
 
 
     <script type="module" src="assets/js/popup.js"></script>
