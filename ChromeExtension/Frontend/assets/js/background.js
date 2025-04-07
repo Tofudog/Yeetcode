@@ -40,7 +40,7 @@ chrome.runtime.onInstalled.addListener(() =>  {
     //anti cheat functions
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     if(chrome.runtime.lastError) {
-        console.error(chrome.runtime.lastError.message);
+        console.log(chrome.runtime.lastError.message);
         return;
     }
 })
