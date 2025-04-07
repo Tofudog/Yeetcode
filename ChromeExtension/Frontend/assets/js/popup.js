@@ -9,23 +9,56 @@ const socket = new WebSocket("ws://localhost:3000/ws");
 // Add connection state tracking
 let isSocketConnected = false;
 
+// Add heartbeat interval
+let heartbeatInterval;
+
 socket.onopen = () => {
     console.log("WebSocket connected");
     isSocketConnected = true;
+    // Send any queued messages
+    while (messageQueue.length > 0) {
+        const message = messageQueue.shift();
+        socket.send(JSON.stringify(message));
+    }
+    
+    // Start heartbeat
+    heartbeatInterval = setInterval(() => {
+        if (isSocketConnected) {
+            socket.send(JSON.stringify({ type: "PING" }));
+        }
+    }, 30000); // Send ping every 30 seconds
 };
 
 socket.onclose = () => {
     console.log("WebSocket disconnected");
     isSocketConnected = false;
+    // Clear heartbeat interval
+    if (heartbeatInterval) {
+        clearInterval(heartbeatInterval);
+    }
 };
+
+socket.onerror = (error) => {
+    console.error("WebSocket error:", error);
+    // Attempt to reconnect after a delay
+    setTimeout(() => {
+        console.log("Attempting to reconnect WebSocket...");
+        socket = new WebSocket(BACKEND_API.replace(/^http/, "ws") + "/ws");
+    }, 5000);
+};
+
+// Add message queue for when WebSocket is disconnected
+let messageQueue = [];
 
 // Helper function to send WebSocket messages
 function sendWebSocketMessage(message) {
     if (isSocketConnected) {
         socket.send(JSON.stringify(message));
     } else {
-        console.log("WebSocket not connected, retrying in 1 second...");
-        setTimeout(() => sendWebSocketMessage(message), 1000);
+        console.log("WebSocket not connected, adding message to queue:", message);
+        messageQueue.push(message);
+        // Try to reconnect
+        socket = new WebSocket(BACKEND_API.replace(/^http/, "ws") + "/ws");
     }
 }
 
@@ -88,7 +121,11 @@ document.addEventListener("DOMContentLoaded", function () {
         // If Player 2 is waiting, start polling for game status
         if (isPlayer2 && gameId) {
             console.log("Starting polling for game status as Player 2");
+            console.log("Current gameId:", gameId);
+            console.log("Current isPlayer2:", isPlayer2);
+            
             pollInterval = setInterval(() => {
+                console.log("Polling game status...");
                 fetch(`${BACKEND_API}/api/games/${gameId}`, {
                     method: "PATCH",
                     headers: { "Content-Type": "application/json" },
@@ -101,8 +138,9 @@ document.addEventListener("DOMContentLoaded", function () {
                         return response.json();
                     })
                     .then(game => {
-                        console.log("Game status update:", game);
+                        console.log("Poll response - Game status:", game.status);
                         if (game.status === "in_progress") {
+                            console.log("Game is in progress, redirecting...");
                             clearInterval(pollInterval);
                             window.location.href = "game-play-screen.html";
                         }
@@ -326,25 +364,38 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         // Handle START_GAME message
         else if (data.type === "START_GAME") {
-            console.log("Received game configuration:", data.config);
+            console.log("Player 2 received START_GAME message");
             
-            // Store the game configuration
-            chrome.storage.local.get(['gameState'], (result) => {
-                const gameState = result.gameState || {};
-                chrome.storage.local.set({
-                    gameState: {
-                        ...gameState,
-                        config: data.config,
-                        status: 'in_progress'
-                    }
-                }, () => {
-                    // Stop polling
-                    clearInterval(pollInterval);
+            // Fetch game configuration from backend
+            fetch(`${BACKEND_API}/api/games/${data.gameId}`)
+                .then(response => response.json())
+                .then(game => {
+                    console.log("Fetched game configuration:", game.config);
                     
-                    // Navigate to game play screen
-                    window.location.href = 'game-play-screen.html';
+                    // Store game configuration in localStorage
+                    localStorage.setItem("gameConfig", JSON.stringify(game.config));
+                    localStorage.setItem("gameTime", game.config.timeLimit);
+                    
+                    // Update game state
+                    chrome.storage.local.set({
+                        gameState: {
+                            gameId: data.gameId,
+                            config: game.config,
+                            status: 'in_progress'
+                        }
+                    }, () => {
+                        // Stop polling
+                        if (pollInterval) {
+                            clearInterval(pollInterval);
+                        }
+                        
+                        // Navigate to game play screen
+                        window.location.href = 'game-play-screen.html';
+                    });
+                })
+                .catch(err => {
+                    console.error("Error fetching game configuration:", err);
                 });
-            });
         }
     };
 

@@ -147,20 +147,28 @@ document.addEventListener('DOMContentLoaded', () => {
           questions: questions
         };
 
-        // Store game configuration
-        chrome.storage.local.set({
-          gameState: {
-            ...gameState,
-            config: gameConfig,
-            status: 'in_progress'
-          }
+        // Update game configuration in backend
+        await fetch(`${BACKEND_API}/api/games/${gameState.gameId}/config`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ config: gameConfig })
         });
 
-        // Send START_GAME message to both players with the questions
+        // Update game status on backend
+        await fetch(`${BACKEND_API}/api/games/${gameState.gameId}/status`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: 'in_progress' })
+        });
+
+        // Store game configuration in localStorage for game play screen
+        localStorage.setItem("gameConfig", JSON.stringify(gameConfig));
+        localStorage.setItem("gameTime", selectedTime);
+
+        // Send START_GAME message to both players
         sendWebSocketMessage({
           type: 'START_GAME',
-          gameId: gameState.gameId,
-          config: gameConfig
+          gameId: gameState.gameId
         });
 
         // Navigate to game play screen
