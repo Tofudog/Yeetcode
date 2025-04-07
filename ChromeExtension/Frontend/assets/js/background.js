@@ -1,4 +1,5 @@
-const socket = new WebSocket("ws://localhost:3000/ws");
+const BACKEND_API = "https://yeetcode-1.onrender.com";
+const socket = new WebSocket(BACKEND_API.replace(/^http/, "ws") + "/ws");
 
 socket.onopen = () => {
     console.log("WebSocket connected.");
