@@ -1,0 +1,123 @@
+.profile-info {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.info-label {
+    font-weight: bold;
+    color: #333;
+}
+
+.info-value {
+    color: #666;
+}
+
+.editable-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.info-value[contenteditable="true"] {
+    min-width: 100px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.info-value[contenteditable="true"]:focus {
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+}
+
+.edit-btn {
+    background: none;
+    border: none;
+    color: #4CAF50;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 4px;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+.edit-btn:hover {
+    opacity: 1;
+}
+
+.password {
+    font-family: monospace;
+    letter-spacing: 2px;
+}
+
+#back-button, #save-profile {
+    display: block;
+    width: 200px;
+    margin: 20px auto;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#save-profile {
+    background-color: #4CAF50;
+    color: white;
+    margin-bottom: 10px;
+}
+
+#save-profile:hover {
+    background-color: #45a049;
+}
+
+#back-button {
+    background-color: #f0c14b;
+    color: #111;
+}
+
+#back-button:hover {
+    background-color: #ddb347;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .profile-info {
+        padding: 10px;
+    }
+
+    .info-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .info-value {
+        margin-top: 5px;
+    }
+
+    .editable-container {
+        width: 100%;
+        margin-top: 5px;
+    }
+
+    .info-value[contenteditable="true"] {
+        flex-grow: 1;
+    }
+} 

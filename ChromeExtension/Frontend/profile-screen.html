@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/profile_styles.css">
+</head>
+<body>
+    <div class="outer-border">
+        <div id="profile-screen" class="screen active">
+            <h1>Profile</h1>
+
+            <div class="profile-info">
+                <div class="info-item">
+                    <span class="info-label">Leetcode Username:</span>
+                    <span class="info-value" id="leetcode-username">Tofudog</span>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-label">Password:</span>
+                    <span class="info-value password">**********</span>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-label">ELO:</span>
+                    <span class="info-value" id="elo-rating">2632</span>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-label">Title:</span>
+                    <span class="info-value" id="player-title">Grandmaster</span>
+                </div>
+
+                <div class="info-item editable">
+                    <span class="info-label">Bio:</span>
+                    <div class="editable-container">
+                        <span class="info-value" id="player-bio" contenteditable="true">CS370 is my favorite class!</span>
+                        <button class="edit-btn" data-field="bio">✎</button>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-label">Number of Problems solved:</span>
+                    <span class="info-value" id="problems-solved">1256</span>
+                </div>
+
+                <div class="info-item editable">
+                    <span class="info-label">University:</span>
+                    <div class="editable-container">
+                        <span class="info-value" id="university" contenteditable="true">Emory University</span>
+                        <button class="edit-btn" data-field="university">✎</button>
+                    </div>
+                </div>
+            </div>
+
+            <button id="save-profile" class="btn">Save Changes</button>
+            <button id="back-button" class="btn">Back</button>
+        </div>
+    </div>
+
+    <script type="module" src="assets/js/profile.js"></script>
+</body>
+</html>

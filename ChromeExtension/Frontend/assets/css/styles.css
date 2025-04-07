@@ -188,3 +188,20 @@ input {
 #toggle-note-checkbox:checked ~ #note-header #toggle-note-button {
     transform: rotate(180deg);
 }
+
+.button-separator {
+    height: 1px;
+    background-color: rgba(0, 0, 0, 0.1);
+    margin: 20px auto;
+    width: 80%;
+}
+
+.profile-btn {
+    background-color: #4CAF50 !important;
+    color: white !important;
+    margin-top: 10px;
+}
+
+.profile-btn:hover {
+    background-color: #45a049 !important;
+}

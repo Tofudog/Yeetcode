@@ -36,6 +36,31 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    // Add profile button handler
+    let view_profile_button = document.getElementById("view-profile-button");
+    if (view_profile_button) {
+        view_profile_button.addEventListener("click", async function() {
+            // If we're on the main screen, prompt for username
+            const username = localStorage.getItem("currentPlayer") || 
+                           prompt("Please enter your Leetcode username:");
+            
+            if (username) {
+                try {
+                    const isValid = await validateUser(username);
+                    if (isValid) {
+                        localStorage.setItem("currentPlayer", username);
+                        window.location.href = "profile-screen.html";
+                    } else {
+                        alert("Invalid Leetcode username. Please try again.");
+                    }
+                } catch (error) {
+                    console.error("Error validating user:", error);
+                    alert("Error validating username. Please try again.");
+                }
+            }
+        });
+    }
+
     let start_game_button = document.getElementById("start-game-button");
     if (start_game_button) {
         start_game_button.addEventListener("click", async function () {
