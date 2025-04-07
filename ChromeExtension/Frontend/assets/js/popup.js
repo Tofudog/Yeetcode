@@ -75,6 +75,7 @@ document.addEventListener("DOMContentLoaded", function () {
     
     let gameId;
     let isPlayer2 = false;
+    let pollInterval; // Move pollInterval to outer scope
 
     // Fetch game state per extension instance
     chrome.storage.local.get(["gameId", "isPlayer2"], (data) => {
@@ -87,8 +88,12 @@ document.addEventListener("DOMContentLoaded", function () {
         // If Player 2 is waiting, start polling for game status
         if (isPlayer2 && gameId) {
             console.log("Starting polling for game status as Player 2");
-            const pollInterval = setInterval(() => {
-                fetch(`${BACKEND_API}/api/games/${gameId}`)
+            pollInterval = setInterval(() => {
+                fetch(`${BACKEND_API}/api/games/${gameId}`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({}) // Empty body to just check status
+                })
                     .then(response => {
                         if (!response.ok) {
                             throw new Error(`HTTP error! status: ${response.status}`);
