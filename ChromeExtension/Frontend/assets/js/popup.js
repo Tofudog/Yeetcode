@@ -261,7 +261,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // Listen for WebSocket updates
+    // WebSocket message handler
     socket.onmessage = async (event) => {
         const data = JSON.parse(event.data);
         const inviteCode = await getInviteCode();
@@ -291,7 +291,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                         // Enable start button
                         toggleButtonState(startGameButton, true);
-                    } 
+                    }
                     // If this is Player 2 (joiner)
                     else {
                         console.log("Joined game! Updating UI...");
@@ -319,10 +319,27 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             });
         }
-
-        // Notify Player 2 when game starts
-        if (data.type === "START_GAME") {
-            window.location.href = "game-play-screen.html";
+        // Handle START_GAME message
+        else if (data.type === "START_GAME") {
+            console.log("Received game configuration:", data.config);
+            
+            // Store the game configuration
+            chrome.storage.local.get(['gameState'], (result) => {
+                const gameState = result.gameState || {};
+                chrome.storage.local.set({
+                    gameState: {
+                        ...gameState,
+                        config: data.config,
+                        status: 'in_progress'
+                    }
+                }, () => {
+                    // Stop polling
+                    clearInterval(pollInterval);
+                    
+                    // Navigate to game play screen
+                    window.location.href = 'game-play-screen.html';
+                });
+            });
         }
     };
 
