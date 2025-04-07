@@ -1,15 +1,3 @@
-<<<<<<< HEAD
-// Leetcode user API functionality
-//import getUserData from "./../../../Backend/leetcode_user.js";
-// import { validateUser } from "./../../../Backend/utils/leetcodeGraphQLQueries.js";
-import generateRandomCode from "../../../Backend/utils/code_generator.js";
-import {validateUser} from "../api/graphql_apis.js";
-import { userRecentSubmissions } from "../api/graphql_apis.js";
-
-document.addEventListener("DOMContentLoaded", async function () {
-
-    // Only attach event listener if the button exists on the current page
-=======
 import generateRandomCode from "./code_generator.js";
 
 const socket = new WebSocket("ws://localhost:3000/ws");
@@ -25,7 +13,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const player2Container = document.getElementById("player2-container");
     let player2Input = document.getElementById("player2Name");
     const confirmJoinButton = document.getElementById("confirm-join");
->>>>>>> button-click-update
     let back_to_main_button = document.getElementById("back-to-main-screen");
     let back_to_main_button_from_join = document.getElementById("back-to-main-screen-from-join");
 

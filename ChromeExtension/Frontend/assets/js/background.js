@@ -41,10 +41,6 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     }
 })
 
-<<<<<<< HEAD
-//Logic for when leetcode submit button is clicked.
-=======
->>>>>>> button-click-update
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if(request.action === "leetcodesubmitclicked") {
         setTimeout(() => {
@@ -52,16 +48,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         }, 5000);
     }
 })
-<<<<<<< HEAD
-
-//     //anti cheat functions
-// chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-//     if(chrome.runtime.lastError) {
-//         console.error(chrome.runtime.lastError.message);
-//         return;
-//     }
-=======
->>>>>>> button-click-update
 
 //     console.log("THIS IS THE TAB URL: " + tab.url)
 //     if (tab.url && tab.url.includes("https://chatgpt.com/")) {
