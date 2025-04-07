@@ -6,6 +6,29 @@ const BACKEND_API = "http://localhost:3000";
 const socket = new WebSocket("ws://localhost:3000/ws");
 
 
+// Add connection state tracking
+let isSocketConnected = false;
+
+socket.onopen = () => {
+    console.log("WebSocket connected");
+    isSocketConnected = true;
+};
+
+socket.onclose = () => {
+    console.log("WebSocket disconnected");
+    isSocketConnected = false;
+};
+
+// Helper function to send WebSocket messages
+function sendWebSocketMessage(message) {
+    if (isSocketConnected) {
+        socket.send(JSON.stringify(message));
+    } else {
+        console.log("WebSocket not connected, retrying in 1 second...");
+        setTimeout(() => sendWebSocketMessage(message), 1000);
+    }
+}
+
 document.addEventListener("DOMContentLoaded", function () {
     // UI Elements
     const createTeamButton = document.getElementById("create-team-button");
@@ -58,20 +81,31 @@ document.addEventListener("DOMContentLoaded", function () {
         if (data.gameId) {
             gameId = data.gameId;
             isPlayer2 = data.isPlayer2;
+            console.log("Retrieved game state:", { gameId, isPlayer2 });
         }
 
         // If Player 2 is waiting, start polling for game status
         if (isPlayer2 && gameId) {
+            console.log("Starting polling for game status as Player 2");
             const pollInterval = setInterval(() => {
                 fetch(`${BACKEND_API}/api/games/${gameId}`)
-                    .then(response => response.json())
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
                     .then(game => {
+                        console.log("Game status update:", game);
                         if (game.status === "in_progress") {
                             clearInterval(pollInterval);
                             window.location.href = "game-play-screen.html";
                         }
                     })
-                    .catch(err => console.error("Error polling game status:", err));
+                    .catch(err => {
+                        console.log("Error polling game status:", err);
+                        // Don't clear the interval on error, keep trying
+                    });
             }, 1500);
         }
     });
@@ -124,9 +158,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 .then(data => {
                     gameId = data._id;
                     chrome.storage.local.set({ gameId });
-                    socket.send(JSON.stringify({ type: "CREATE_GAME", gameId, invitation_code: code }));
+                    sendWebSocketMessage({ type: "CREATE_GAME", gameId, invitation_code: code });
                 })
-                .catch(error => console.error("Error creating game:", error));
+                .catch(error => console.log("Error creating game:", error));
             }
         });
     }
@@ -159,6 +193,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     return;
                 }
 
+                console.log("Attempting to join game with code:", codeInput);
                 fetch(`${BACKEND_API}/api/games/join`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -167,26 +202,55 @@ document.addEventListener("DOMContentLoaded", function () {
                         username: result.user.leetcodeId 
                     })
                 })
-                .then(res => res.json())
+                .then(res => {
+                    if (!res.ok) {
+                        throw new Error(`HTTP error! status: ${res.status}`);
+                    }
+                    return res.json();
+                })
                 .then(data => {
+                    console.log("Join game response:", data);
                     if (data.message) {
                         alert(data.message);
                     } else {
+                        gameId = data._id;
                         chrome.storage.local.set({ 
                             gameId: data._id, 
                             isPlayer2: true, 
                             player2: result.user.leetcodeId 
-                        });
+                        }, () => {
+                            console.log("Game state stored:", { 
+                                gameId: data._id, 
+                                isPlayer2: true, 
+                                player2: result.user.leetcodeId 
+                            });
 
-                        socket.send(JSON.stringify({ 
-                            type: "PLAYER_JOINED", 
-                            gameId: data._id, 
-                            invitation_code: codeInput,
-                            player2: result.user.leetcodeId 
-                        }));
+                            // Send join message with Player 2's info
+                            sendWebSocketMessage({ 
+                                type: "PLAYER_JOINED", 
+                                gameId: data._id, 
+                                invitation_code: codeInput,
+                                player2: result.user.leetcodeId 
+                            });
+
+                            // Hide the join form and show the waiting message
+                            const joinForm = document.getElementById("teamCodeInput");
+                            const joinButton = document.getElementById("confirm-join");
+                            if (joinForm) joinForm.style.display = "none";
+                            if (joinButton) joinButton.style.display = "none";
+
+                            // Show waiting message
+                            const waitingMsg = document.createElement("p");
+                            waitingMsg.id = "waitingMsg";
+                            waitingMsg.textContent = "Waiting for Player 1 to start the game...";
+                            document.getElementById("join-team-screen").appendChild(waitingMsg);
+                        });
                     }
                 })
-                .catch(err => console.error("Failed to join game:", err));
+                .catch(err => {
+                    console.log("Failed to join game:", err);
+                    alert("Failed to join game. Please try again.");
+                });
             });
         });
     }
@@ -202,29 +266,56 @@ document.addEventListener("DOMContentLoaded", function () {
         const data = JSON.parse(event.data);
         const inviteCode = await getInviteCode();
 
-        if (data.type === "PLAYER_JOINED" && data.invitation_code === inviteCode) {
-            chrome.storage.local.get(["inviteCode"], (storage) => {
+        if (data.type === "PLAYER_JOINED") {
+            chrome.storage.local.get(["inviteCode", "isPlayer2"], (storage) => {
                 if (data.invitation_code === storage.inviteCode) {
-                    console.log("Player 2 has joined! Updating UI...");
+                    // If this is Player 1 (creator)
+                    if (!storage.isPlayer2) {
+                        console.log("Player 2 has joined! Updating UI...");
 
-                    // Update Player 2's name display
-                    const player2Name = document.getElementById("player2Name");
-                    if (player2Name) {
-                        player2Name.textContent = data.player2 || "";
+                        // Update Player 2's name display
+                        const player2Name = document.getElementById("player2Name");
+                        if (player2Name) {
+                            player2Name.textContent = data.player2 || "";
+                        }
+
+                        // Hide "Waiting for Player 2..." message
+                        const waitingMsg = document.getElementById("waitingMsg");
+                        if (waitingMsg) waitingMsg.remove();
+
+                        // Show Player 2 container
+                        const player2Container = document.getElementById("player2-container");
+                        if (player2Container) {
+                            player2Container.style.display = "block";
+                        }
+
+                        // Enable start button
+                        toggleButtonState(startGameButton, true);
+                    } 
+                    // If this is Player 2 (joiner)
+                    else {
+                        console.log("Joined game! Updating UI...");
+                        
+                        // Get Player 1's name from storage
+                        chrome.storage.local.get(['user'], (result) => {
+                            const player1Name = document.getElementById("player1Name");
+                            if (player1Name) {
+                                player1Name.textContent = result.user.leetcodeId;
+                            }
+                        });
+
+                        // Hide the join form and show the waiting message
+                        const joinForm = document.getElementById("teamCodeInput");
+                        const joinButton = document.getElementById("confirm-join");
+                        if (joinForm) joinForm.style.display = "none";
+                        if (joinButton) joinButton.style.display = "none";
+
+                        // Show waiting message
+                        const waitingMsg = document.createElement("p");
+                        waitingMsg.id = "waitingMsg";
+                        waitingMsg.textContent = "Waiting for Player 1 to start the game...";
+                        document.getElementById("join-team-screen").appendChild(waitingMsg);
                     }
-
-                    // Hide "Waiting for Player 2..." message
-                    const waitingMsg = document.getElementById("waitingMsg");
-                    if (waitingMsg) waitingMsg.remove();
-
-                    // Show Player 2 container
-                    const player2Container = document.getElementById("player2-container");
-                    if (player2Container) {
-                        player2Container.style.display = "block";
-                    }
-
-                    // Enable start button
-                    toggleButtonState(startGameButton, true);
                 }
             });
         }
@@ -261,7 +352,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     window.location.href = "game-setup-screen.html";
                 });
             } catch (err) {
-                console.error("Failed to proceed to game setup:", err);
+                console.log("Failed to proceed to game setup:", err);
             }
         });
     }
