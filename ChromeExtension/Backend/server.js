@@ -5,6 +5,7 @@ import { WebSocketServer } from 'ws';
 import connectDB from './config/db.js';
 import gameRoutes from './routes/gameRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import authRoutes from './routes/authRoutes.js';
 import { fetchRecentSubmissions } from './utils/leetcodeGraphQLQueries.js';
 import { validateUser } from './utils/leetcodeGraphQLQueries.js';
 import { deleteAllUsers } from './controllers/userController.js';
@@ -55,6 +56,8 @@ connectDB();
 // Routes
 app.use('/api/users', userRoutes);
 app.use('/api/games', gameRoutes);
+app.use('/api/auth', authRoutes);
+
 
 //<!--------------------GraphQL Queries---------------------!>
 

@@ -1,18 +1,5 @@
 import User from '../models/userModel.js';
 
-// Create a new user
-const createUser = async (req, res) => {
-  const { username } = req.body;
-
-  try {
-    const newUser = new User({ username });
-    await newUser.save();
-    res.status(201).json(newUser);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
-
 // Get all users
 const getAllUsers = async (req, res) => {
   try {
@@ -57,4 +44,4 @@ const deleteAllUsers = async (req, res) => {
   }
 };
 
-export { getAllUsers, getUserById, createUser, deleteUserById, deleteAllUsers };
+export { getAllUsers, getUserById, deleteUserById, deleteAllUsers };

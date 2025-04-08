@@ -1,7 +1,15 @@
 import mongoose from 'mongoose';
 
 const UserSchema = new mongoose.Schema({
-  username: {
+  yeetcode_username: {
+    type: String,
+    required: true
+  },
+  yeetcode_password: {
+    type: String,
+    required: true
+  },
+  leetcode_username: {
     type: String,
     required: true
   },
