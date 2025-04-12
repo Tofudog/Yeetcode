@@ -94,30 +94,49 @@ if (!findSubmitButtonAndAddListener()) {
 
 
 //<!-------------Disabling & Enabling Solution Tab Logic----------------!>
+// const observer = new MutationObserver(() => {
+//     const solutionsTab = document.getElementById('solutions_tab');
+
+//     chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+//         if (!solutionsTab) return;
+
+//         const clickableTabWrapper = solutionsTab.closest('.flexlayout__tab_button');
+
+//         if (!clickableTabWrapper) {
+//             console.log("Clickable tab wrapepr is not found.");
+//             return;
+//         }
+
+//         if (request.action === "disable_solution_tab") {
+//             clickableTabWrapper.style.pointerEvents = 'none';
+//             clickableTabWrapper.style.opacity = '0.5';
+//             observer.disconnect();
+//         }
+
+//         if (request.action === "enable_solution_tab") {
+//             clickableTabWrapper.style.pointerEvents = 'auto';
+//             clickableTabWrapper.style.opacity = '1';
+//         }
+//     });
+// });
+
+// observer.observe(document.body, { childList: true, subtree: true });
+
+
+//<!-------------Disabling Solution Tab Logic----------------!>
 const observer = new MutationObserver(() => {
     const solutionsTab = document.getElementById('solutions_tab');
+    if (solutionsTab) {
+        //finds the nearest ancestor (that matches the CSS selector, essentially jut grabs the nearest parent (or self) that has the class .flexlayout__tab_button)
+        const clickableTabWrapper = solutionsTab.closest('.flexlayout__tab_button'); 
 
-    chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-        if (!solutionsTab) return;
-
-        const clickableTabWrapper = solutionsTab.closest('.flexlayout__tab_button');
-
-        if (!clickableTabWrapper) {
-            console.log("Clickable tab wrapepr is not found.");
-            return;
-        }
-
-        if (request.action === "disable_solution_tab") {
+        if (clickableTabWrapper) {
             clickableTabWrapper.style.pointerEvents = 'none';
             clickableTabWrapper.style.opacity = '0.5';
             observer.disconnect();
+        } else {
+            console.log("Could not find clickable tab wrapper.");
         }
-
-        if (request.action === "enable_solution_tab") {
-            clickableTabWrapper.style.pointerEvents = 'auto';
-            clickableTabWrapper.style.opacity = '1';
-        }
-    });
+    }
 });
-
 observer.observe(document.body, { childList: true, subtree: true });
