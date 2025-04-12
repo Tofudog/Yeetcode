@@ -6,7 +6,7 @@ import connectDB from './config/db.js';
 import gameRoutes from './routes/gameRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import authRoutes from './routes/authRoutes.js';
-import { fetchRecentSubmissions } from './utils/leetcodeGraphQLQueries.js';
+import { getLeetCodeProblemInfo, fetchRecentSubmissions } from './utils/leetcodeGraphQLQueries.js';
 import { validateUser } from './utils/leetcodeGraphQLQueries.js';
 import { deleteAllUsers } from './controllers/userController.js';
 
@@ -109,6 +109,28 @@ app.post('/api/validateUser', async (req, res) => {
   }
 
 });
+
+/**
+ * Query for getting the problem info.
+ * 
+ * @return a list with two values: ls[0] gets the problem difficulty and ls[1] gets a boolean if the problem is premium (true) or not (false)
+ */
+app.post('/api/leetcodeProblemInfo', async (req, res) =>{ 
+  const {titleSlug} = req.body;
+
+  if(!titleSlug) {
+    return res.status(400).json({ error: "title slug is required"});
+  }
+
+  try {
+    const problemInfo = await getLeetCodeProblemInfo(titleSlug);
+    return res.json(problemInfo)
+  } catch(error) {
+    console.error("Error fetching LeetCode submission details:", error);
+    res.status(500).json({ error: "Internal server error" });
+    return []; 
+  }
+})
 
 const port = process.env.PORT || 2000;
 server.listen(port, () => {

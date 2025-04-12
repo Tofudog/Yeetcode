@@ -1,5 +1,5 @@
 const { expect, test } = require('@jest/globals');
-import isValid from "../utils/validateUser.js";
+import { validateUser } from '../utils/leetcodeGraphQLQueries';
 
 const VALID_USERNAMES = [
     "Tofudog25"
@@ -10,7 +10,7 @@ const INVALID_USERNAMES = [
 
 async function checkValid(username) {
     //check if a particular username is valid
-    const userValid = await isValid(username);
+    const userValid = await validateUser(username);
     let exists = "";
     if (userValid) {
         exists = "Yes";
@@ -25,7 +25,7 @@ async function checkValid(username) {
 for (var i=0; i<VALID_USERNAMES.length; i++) {
     const currentUser = VALID_USERNAMES[i];
     test(`Make sure ${VALID_USERNAMES[i]} is valid`, async () => {
-        const validStatus = await isValid(currentUser);
+        const validStatus = await validateUser(currentUser);
         expect(validStatus).toBe(true);
     });
 }
@@ -33,7 +33,7 @@ for (var i=0; i<VALID_USERNAMES.length; i++) {
 for (var i=0; i<INVALID_USERNAMES.length; i++) {
     const currentUser = INVALID_USERNAMES[i];
     test(`Make sure ${INVALID_USERNAMES[i]} is NOT valid`, async () => {
-        const validStatus = await isValid(currentUser);
+        const validStatus = await validateUser(currentUser);
         expect(validStatus).toBe(false);
     });
 }
