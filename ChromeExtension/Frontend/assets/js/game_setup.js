@@ -144,6 +144,8 @@ document.addEventListener('DOMContentLoaded', () => {
           }));
           
           // Navigate to game play screen
+          chrome.runtime.sendMessage({message: "game start"});
+          
           window.location.href = "game-play-screen.html";
         };
       } catch (err) {

@@ -45,6 +45,8 @@ function updateSubmissionUI(submissions) {
 
 // Function to determine winner and handle game over
 function handleGameOver() {
+    chrome.runtime.sendMessage({message: "game over"});
+    
     const player1Completed = countCompletedProblems(0);
     const player2Completed = countCompletedProblems(1);
     
