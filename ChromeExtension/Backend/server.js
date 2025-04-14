@@ -114,7 +114,7 @@ app.post('/api/validateUser', async (req, res) => {
 /**
  * Query for getting the problem info.
  * 
- * @return an object type with three values: difficulty, isPaidOnly, and topicTags, a list of tags associated with the problem.
+ * @return an object type with three values: difficulty, isPaidOnly, and category, the category title for the problem 
  */
 app.post('/api/leetcodeProblemInfo', async (req, res) =>{ 
   const {titleSlug} = req.body;
