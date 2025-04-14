@@ -81,6 +81,7 @@ export const getLeetCodeProblemInfo = async (titleSlug) => {
             question(titleSlug: $titleSlug) {
                 difficulty
                 isPaidOnly
+                categoryTitle
             }
         }
     `;
@@ -98,8 +99,9 @@ export const getLeetCodeProblemInfo = async (titleSlug) => {
 
         var difficulty = data.data.question.difficulty;
         var isPaidOnly = data.data.question.isPaidOnly;
+        var category = data.data.question.categoryTitle;
 
-        var problemInfo = [difficulty, isPaidOnly];
+        var problemInfo = [difficulty, isPaidOnly, category];
 
         return problemInfo
     } catch(error) {

@@ -13,6 +13,11 @@ for (const problem of data.easy) {
         const paid = problemInfo[1];
         expect(paid).toBe(false);
     });
+    test(`Make sure ${problem} is algorithmic`, async () => {
+        const problemInfo = await getLeetCodeProblemInfo(problem);
+        const category = problemInfo[2];
+        expect(category).toBe("Algorithms");
+    });
 }
 
 for (const problem of data.medium) {
@@ -26,6 +31,11 @@ for (const problem of data.medium) {
         const paid = problemInfo[1];
         expect(paid).toBe(false);
     });
+    test(`Make sure ${problem} is algorithmic`, async () => {
+        const problemInfo = await getLeetCodeProblemInfo(problem);
+        const category = problemInfo[2];
+        expect(category).toBe("Algorithms");
+    });
 }
 
 for (const problem of data.hard) {
@@ -38,5 +48,10 @@ for (const problem of data.hard) {
         const problemInfo = await getLeetCodeProblemInfo(problem);
         const paid = problemInfo[1];
         expect(paid).toBe(false);
+    });
+    test(`Make sure ${problem} is algorithmic`, async () => {
+        const problemInfo = await getLeetCodeProblemInfo(problem);
+        const category = problemInfo[2];
+        expect(category).toBe("Algorithms");
     });
 }
