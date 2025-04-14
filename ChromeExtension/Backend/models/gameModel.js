@@ -49,10 +49,6 @@ const GameSchema = new mongoose.Schema({
   score: {
     player_1: { type: Number, default: 0 },
     player_2: { type: Number, default: 0 }
-  },
-  date: {
-    type: Date,
-    default: null
   }
 }, { timestamps: true });
 

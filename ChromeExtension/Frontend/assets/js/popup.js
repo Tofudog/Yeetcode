@@ -39,7 +39,7 @@ socket.onclose = () => {
 };
 
 socket.onerror = (error) => {
-    console.error("WebSocket error:", error);
+    console.log("WebSocket error:", error);
     // Attempt to reconnect after a delay
     setTimeout(() => {
         console.log("Attempting to reconnect WebSocket...");
@@ -66,8 +66,8 @@ document.addEventListener("DOMContentLoaded", function () {
     // UI Elements
     const createTeamButton = document.getElementById("create-team-button");
     const joinTeamButton = document.getElementById("join-team-button");
-    const startGameButton = document.getElementById("start-game-button");
-    const copyCodeButton = document.getElementById("copyCode");
+    const setupGameButton = document.getElementById("setup-game-button");
+    const startGameButton = document.getElementById("start-game-button");    
     const inviteCodeElement = document.getElementById("inviteCode");
     const player2Container = document.getElementById("player2-container");
     const confirmJoinButton = document.getElementById("confirm-join");
@@ -76,7 +76,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Check if user is logged in and display username
     chrome.storage.local.get(['user'], (result) => {
-        if (!result.user || !result.user.loggedIn) {
+        const user = result.user;
+        if (!user || !result.user.username || !result.user.token) {
             window.location.href = "login-page-screen.html";
             return;
         }
@@ -86,10 +87,10 @@ document.addEventListener("DOMContentLoaded", function () {
         const player2NameDisplay = document.getElementById('player2Name');
         
         if (player1NameDisplay) {
-            player1NameDisplay.textContent = result.user.leetcodeId;
+            player1NameDisplay.textContent = result.user.username;
         }
         if (player2NameDisplay) {
-            player2NameDisplay.textContent = result.user.leetcodeId;
+            player2NameDisplay.textContent = result.user.username;
         }
     });
 
@@ -108,51 +109,9 @@ document.addEventListener("DOMContentLoaded", function () {
     
     let gameId;
     let gameConfigurations;
-    let isPlayer2 = false;
+    let player_1;
+    let player_2;
     let pollInterval; // Move pollInterval to outer scope
-
-    // Fetch game state per extension instance
-    chrome.storage.local.get(["gameId", "isPlayer2"], (data) => {
-        if (data.gameId) {
-            gameId = data.gameId;
-            isPlayer2 = data.isPlayer2;
-            console.log("Retrieved game state:", { gameId, isPlayer2 });
-        }
-
-        // If Player 2 is waiting, start polling for game status
-        if (isPlayer2 && gameId) {
-            console.log("Starting polling for game status as Player 2");
-            console.log("Current gameId:", gameId);
-            console.log("Current isPlayer2:", isPlayer2);
-            
-            pollInterval = setInterval(() => {
-                console.log("Polling game status...");
-                fetch(`${BACKEND_API}/api/games/${gameId}`, {
-                    method: "PATCH",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({}) // Empty body to just check status
-                })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-                        return response.json();
-                    })
-                    .then(game => {
-                        console.log("Poll response - Game status:", game.status);
-                        if (game.status === "in_progress") {
-                            console.log("Game is in progress, redirecting...");
-                            clearInterval(pollInterval);
-                            window.location.href = "game-play-screen.html";
-                        }
-                    })
-                    .catch(err => {
-                        console.log("Error polling game status:", err);
-                        // Don't clear the interval on error, keep trying
-                    });
-            }, 1500);
-        }
-    });
 
     // Toggle button state
     const toggleButtonState = (button, isEnabled) => {
@@ -164,86 +123,82 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     // Create Team Flow (Player 1)
+
     if (createTeamButton) {
         createTeamButton.addEventListener("click", () => {
-            // Only clear game-related data, not user data
-            chrome.storage.local.get(['user'], (result) => {
-                const userData = result.user;
-                chrome.storage.local.clear(() => {
-                    // Restore user data after clearing
-                    if (userData) {
-                        chrome.storage.local.set({ user: userData });
-                    }
-                    window.location.href = "create-team-screen.html";
+            const code = generateRandomCode();
+            chrome.storage.local.set({ invitation_code: code }, () => {
+                chrome.storage.local.get(["user", "invitation_code"], (result) => {
+                    const player_1 = result.user.username;
+                    chrome.storage.local.set({
+                        player_1: player_1,
+                        player_2: null
+                    }, () => {
+                        window.location.href = "create-team-screen.html"; // only redirect *after* everything is saved
+                    });
                 });
             });
         });
     }
+    
 
     if (inviteCodeElement) {
-        chrome.storage.local.get(["inviteCode", "user"], (data) => {
-            let code = data.inviteCode || generateRandomCode();
-            inviteCodeElement.innerText = code;
-            chrome.storage.local.set({ inviteCode: code });
+        console.log("test: global player 1 is: ",player_1)
+        toggleButtonState(setupGameButton, false);
 
-            toggleButtonState(startGameButton, false);
-
-            if (!gameId) {
-                // Create game on backend with logged-in username
-                fetch(`${BACKEND_API}/api/games`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ 
-                        invitation_code: code, 
-                        username: data.user.leetcodeId 
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    gameId = data._id;
-                    chrome.storage.local.set({ gameId });
-                    sendWebSocketMessage({ type: "CREATE_GAME", gameId, invitation_code: code });
-                })
-                .catch(error => console.log("Error creating game:", error));
+        chrome.storage.local.get(["invitation_code", "player_1"], (result) => {
+            if (inviteCodeElement && result.invitation_code) {
+                inviteCodeElement.innerText = result.invitation_code;
             }
-        });
-    }
 
-    // Copy Code Button
-    if (copyCodeButton) {
-        copyCodeButton.addEventListener("click", () => {
-            chrome.storage.local.get(["inviteCode"], (data) => {
-                navigator.clipboard.writeText(data.inviteCode).then(() => {
-                    alert("Code copied!");
-                });
-            });
+            fetch(`${BACKEND_API}/api/games`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    invitation_code: result.invitation_code, 
+                    player_1: result.player_1
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                gameId = data._id;
+                chrome.storage.local.set({ gameId: gameId });
+                sendWebSocketMessage({ type: "CREATE_GAME", gameId, invitation_code: result.invitation_code, player_1: result.player_1});
+            })
+            .catch(error => console.log("Error creating game:", error));
         });
     }
 
     // Join Team Flow (Player 2)
     if (joinTeamButton) {
         joinTeamButton.addEventListener("click", () => {
-            window.location.href = "join-team-screen.html";
+            chrome.storage.local.get(["user"], (data) => {
+                player_2 = data.user.username;
+                chrome.storage.local.set({
+                    player_1: null,
+                    player_2: player_2,
+                    isPlayer2: true
+                }, () => {
+                    // Only redirect *after* storage is fully written
+                    window.location.href = "join-team-screen.html";
+                });
+            });
         });
     }
+    
 
     if (confirmJoinButton) {
         confirmJoinButton.addEventListener("click", () => {
             const codeInput = document.getElementById("teamCodeInput").value.trim();
-            
-            chrome.storage.local.get(['user'], (result) => {
-                if (!result.user || !result.user.loggedIn) {
-                    window.location.href = "login-page-screen.html";
-                    return;
-                }
+            chrome.storage.local.set({invitation_code: codeInput})
 
-                console.log("Attempting to join game with code:", codeInput);
+            chrome.storage.local.get(["user", "invitation_code"], (result) => {
                 fetch(`${BACKEND_API}/api/games/join`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ 
-                        invitation_code: codeInput, 
-                        username: result.user.leetcodeId 
+                        invitation_code: result.invitation_code, 
+                        player_2: result.user.username
                     })
                 })
                 .then(res => {
@@ -258,23 +213,17 @@ document.addEventListener("DOMContentLoaded", function () {
                         alert(data.message);
                     } else {
                         gameId = data._id;
+                        player_1 = data.player_1
                         chrome.storage.local.set({ 
-                            gameId: data._id, 
-                            isPlayer2: true, 
-                            player2: result.user.leetcodeId 
+                            gameId,
+                            player_1
                         }, () => {
-                            console.log("Game state stored:", { 
-                                gameId: data._id, 
-                                isPlayer2: true, 
-                                player2: result.user.leetcodeId 
-                            });
-
                             // Send join message with Player 2's info
                             sendWebSocketMessage({ 
                                 type: "PLAYER_JOINED", 
                                 gameId: data._id, 
-                                invitation_code: codeInput,
-                                player2: result.user.leetcodeId 
+                                invitation_code: result.invitation_code,
+                                player_2: result.user.username 
                             });
 
                             // Hide the join form and show the waiting message
@@ -298,88 +247,83 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
     }
+    
+    // chrome.storage.local.get(["gameId", "isPlayer2"], (data) => {
+    //     if (data.gameId && data.isPlayer2) {
+    //         gameId = data.gameId;
+    //         player_2 = data.isPlayer2;
+    //         console.log("Retrieved game state:", { gameId, player_2 });
+    
+    //         const pollInterval = setInterval(() => {
+    //             console.log("Polling game status...");
+    
+    //             fetch(`${BACKEND_API}/api/games/${gameId}`, {
+    //                 method: "GET",
+    //                 headers: { "Content-Type": "application/json" }
+    //             })
+    //             .then(response => {
+    //                 if (!response.ok) {
+    //                     throw new Error(`HTTP error! status: ${response.status}`);
+    //                 }
+    //                 return response.json();
+    //             })
+    //             .then(game => {
+    //                 console.log("Poll response - Game status:", game.status);
+    //                 if (game.status === "in_progress") {
+    //                     clearInterval(pollInterval); // Stop polling
+    //                     chrome.storage.local.set({ game_obj: game }, () => {
+    //                         window.location.href = "game-play-screen.html";
+    //                     });
+    //                 }
+    //             })
+    //             .catch(err => {
+    //                 console.log("Error polling game status:", err);
+    //                 // optionally: retry again
+    //             });
+    
+    //         }, 1500); // every 1.5 seconds
+    //     }
+    // });    
 
-    async function getInviteCode() {
-        return new Promise((resolve) => {
-            chrome.storage.local.get(["inviteCode"], (data) => resolve(data.inviteCode));
-        });
-    }
 
     // WebSocket message handler
     socket.onmessage = async (event) => {
         const data = JSON.parse(event.data);
-        const inviteCode = await getInviteCode();
-
+    
+        const myInviteCode = await new Promise(resolve => {
+            chrome.storage.local.get(["invitation_code"], res => resolve(res.invitation_code));
+        });
+    
+        if (data.invitation_code !== myInviteCode) {
+            console.log("Ignored message not for this game:", data);
+            return; // Ignore updates for other games
+        }
+    
         if (data.type === "PLAYER_JOINED") {
-            chrome.storage.local.get(["inviteCode", "isPlayer2"], (storage) => {
-                if (data.invitation_code === storage.inviteCode) {
-                    // If this is Player 1 (creator)
-                    if (!storage.isPlayer2) {
-                        console.log("Player 2 has joined! Updating UI...");
-                        localStorage.setItem("player2",data.player2)
-
-                        // Update Player 2's name display
-                        const player2Name = document.getElementById("player2Name");
-                        if (player2Name) {
-                            player2Name.textContent = data.player2 || "";
-                        }
-
-                        // Hide "Waiting for Player 2..." message
-                        const waitingMsg = document.getElementById("waitingMsg");
-                        if (waitingMsg) waitingMsg.remove();
-
-                        // Show Player 2 container
-                        const player2Container = document.getElementById("player2-container");
-                        if (player2Container) {
-                            player2Container.style.display = "block";
-                        }
-
-                        // Enable start button
-                        toggleButtonState(startGameButton, true);
-                    }
-                    // If this is Player 2 (joiner)
-                    else {
-                        console.log("Joined game! Updating UI...");
-                        
-                        // Get Player 1's name from storage
-                        chrome.storage.local.get(['user'], (result) => {
-                            const player1Name = document.getElementById("player1Name");
-                            if (player1Name) {
-                                player1Name.textContent = result.user.leetcodeId;
-                            }
-                        });
-
-                        // Hide the join form and show the waiting message
-                        const joinForm = document.getElementById("teamCodeInput");
-                        const joinButton = document.getElementById("confirm-join");
-                        if (joinForm) joinForm.style.display = "none";
-                        if (joinButton) joinButton.style.display = "none";
-
-                        // Show waiting message
-                        const waitingMsg = document.createElement("p");
-                        waitingMsg.id = "waitingMsg";
-                        waitingMsg.textContent = "Waiting for Player 1 to start the game...";
-                        document.getElementById("join-team-screen").appendChild(waitingMsg);
-                    }
+            chrome.storage.local.get(["player_2"], (res) => {
+                if (!res.player_2) {
+                    // Player 1 UI update
+                    console.log(`Player 2, ${data.player_2} has joined! Updating UI...`);
+                    const player2Name = document.getElementById("player2Name");
+                    if (player2Name) player2Name.textContent = data.player_2;
+                    chrome.storage.local.set({player_2: data.player_2})
+    
+                    const container = document.getElementById("player2-container");
+                    if (container) container.style.display = "block";
+    
+                    toggleButtonState(setupGameButton, true);
                 }
             });
         }
-        // Handle START_GAME message
-        else if (data.type === "START_GAME") {
-            console.log("Player 2 received START_GAME message");
-            
-            // Fetch game configuration from backend
+    
+        if (data.type === "START_GAME") {
+            console.log("Received START_GAME signal");
+    
             fetch(`${BACKEND_API}/api/games/${data.gameId}`)
                 .then(response => response.json())
                 .then(game => {
-                    console.log("Fetched game configuration:", game.config);
-                    
-                    // Store game configuration in localStorage
-                    localStorage.setItem("gameConfig", JSON.stringify(game.config));
-                    localStorage.setItem("gameTime", game.config.timeLimit);
-                    // localStorage.setItem("opponent_player", )
-                    
-                    // Update game state
+                    // TODO: save game config to local storage
+    
                     chrome.storage.local.set({
                         gameState: {
                             gameId: data.gameId,
@@ -387,58 +331,45 @@ document.addEventListener("DOMContentLoaded", function () {
                             status: 'in_progress'
                         }
                     }, () => {
-                        // Stop polling
-                        if (pollInterval) {
-                            clearInterval(pollInterval);
-                        }
-                        
-                        // Navigate to game play screen
                         window.location.href = 'game-play-screen.html';
                     });
                 })
                 .catch(err => {
-                    console.error("Error fetching game configuration:", err);
+                    console.log("Error fetching game config:", err);
                 });
         }
-    };
+    };    
+
+    // Setup Game Button
+    if (setupGameButton) {
+        setupGameButton.addEventListener("click", async () => {
+            // Navigate Player 1 to setup
+            window.location.href = "game-setup-screen.html";
+        });        
+    } 
 
     // Start Game Button
     if (startGameButton) {
         startGameButton.addEventListener("click", async () => {
-            try {
-                chrome.storage.local.get(['user', 'player2'], (result) => {
-                    const player1Name = result.user.leetcodeId;
-                    const player2Name = result.player2;
-
-                    // Store in localStorage
-                    localStorage.setItem("Player1", player1Name);
-                    localStorage.setItem("Player2", player2Name);
-
-                    // Store game state before navigation
-                    chrome.storage.local.set({
-                        gameState: {
-                            gameId: gameId,
-                            player1: player1Name,
-                            player2: player2Name,
-                            status: "setup"
-                        }
-                    });
-
-                    // Navigate to setup screen
-                    window.location.href = "game-setup-screen.html";
+            chrome.storage.local.get(['user', 'player_2', 'gameId', 'invitation_code'], (result) => {
+                const player1Name = result.user.username;
+                const player2Name = result.player_2;
+                const gameId = result.gameId;
+                const invitation_code = result.invitation_code;
+        
+                // Notify Player 2 that game has started
+                sendWebSocketMessage({
+                    type: "START_GAME",
+                    gameId,
+                    invitation_code,
+                    player_1: player1Name,
+                    player_2: player2Name
                 });
-            } catch (err) {
-                console.log("Failed to proceed to game setup:", err);
-            }
-        });
-    }
-
-    let game_code_text = document.getElementById("inviteCode");
-    if (game_code_text) {
-        const gameCode = localStorage.getItem("gameCode");
-        game_code_text.innerText = gameCode;
-        //then add this game code (with other features like player)
-        //to the list of currently available games
+        
+                // Navigate Player 1 to play screen
+                window.location.href = "game-play-screen.html"
+            });
+        });        
     }
 
     const toggleCheckbox = document.getElementById("toggle-note-checkbox");

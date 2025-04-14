@@ -21,7 +21,7 @@ export const createGame = async (req, res) => {
       return res.status(400).json({ message: 'invitation_code is required' });
     }
     if (!player_1) {
-      return res.status(400).json({ message: 'player_1\'s username is required' });
+      return res.status(400).json({ message: 'player_1\'s yeetcode username is required' });
     }
 
     // Check if invitation_code already exists
@@ -45,10 +45,14 @@ export const createGame = async (req, res) => {
 // Join a game
 export const joinGame = async (req, res) => {
   try {
-    const { invitation_code, username } = req.body;
+    const { invitation_code, player_2 } = req.body;
 
     if (!invitation_code) {
       return res.status(400).json({ message: 'invitation_code is required' });
+    }
+
+    if (!player_2) {
+      return res.status(400).json({ message: 'player_2\'s yeetcode username is required' });
     }
 
     const game = await Game.findOne({ invitation_code });
@@ -61,11 +65,11 @@ export const joinGame = async (req, res) => {
       return res.status(400).json({ message: 'Player 2 already joined' });
     }
 
-    if (game.player_1 === username) {
+    if (game.player_1 === player_2) {
       return res.status(400).json({ message: 'You are already in this game as Player 1' });
     }
 
-    game.player_2 = username;
+    game.player_2 = player_2;
     game.status = 'paired';
     await game.save();
 

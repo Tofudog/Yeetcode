@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Start button
-  const startBtn = document.getElementById("start-btn");
+  const startBtn = document.getElementById("start-game-button");
   if (startBtn) {
     startBtn.addEventListener("click", async function() {
       try {

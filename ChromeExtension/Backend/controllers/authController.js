@@ -36,7 +36,6 @@ const signin = async (req, res) => {
   
       const token = sign({ _id: user.yeetcode_username, name: user.leetcode_username }, process.env.JWT_KEY, { expiresIn: '1h' });
       return res.status(200).json({success: true, data: { token } });
-  
   }
   
   export const getProfile = async (req, res) => {

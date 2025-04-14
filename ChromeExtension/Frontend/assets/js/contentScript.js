@@ -77,3 +77,51 @@ if (!findSubmitButtonAndAddListener()) {
 } else {
     console.log("Yeetcode Content Script: Button found immediately on load.");
 }
+console.log("[ContentScript] Content script loaded");
+
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+    console.log("[ContentScript] Received message:", msg);
+    
+    if (msg.type === "START_GAME") {
+        console.log("[ContentScript] Received START_GAME message", msg);
+
+        try {
+            // Store game data in multiple formats for better compatibility
+            chrome.storage.local.set({
+                // Format 1: As gameState object
+                gameState: {
+                    gameId: msg.gameId,
+                    player_1: msg.player_1,
+                    player_2: msg.player_2,
+                    status: "in_progress"
+                },
+                // Format 2: As direct properties
+                player_1: msg.player_1,
+                player_2: msg.player_2,
+                gameId: msg.gameId,
+                gameStarted: true
+            }, () => {
+                console.log("[ContentScript] Game data stored in multiple formats");
+                
+                // Also store in localStorage for immediate access
+                localStorage.setItem("Player1", msg.player_1);
+                localStorage.setItem("Player2", msg.player_2);
+                
+                console.log("[ContentScript] Game data stored in localStorage");
+                console.log("[ContentScript] Redirecting to game-play-screen.html");
+                
+                // Redirect to game play screen
+                window.location.href = "game-play-screen.html";
+            });
+            
+            // Send response back to background script
+            sendResponse({ status: "redirecting" });
+        } catch (error) {
+            console.error("[ContentScript] Error handling START_GAME message:", error);
+            sendResponse({ status: "error", message: error.message });
+        }
+    }
+    
+    // Return true to indicate we'll send a response asynchronously
+    return true;
+});

@@ -27,17 +27,17 @@ document.addEventListener("DOMContentLoaded", function () {
                 })
             });
 
-            const data = await response.json();
-            console.log("Login response:", data); // Debug log
-
             if (response.ok) {
+                const data_obj = await response.json();
                 // Store user data in chrome storage
                 chrome.storage.local.set({
                     user: {
-                        yeetcode_id: data._id,
-                        yeetcode_username: data.yeetcode_username,
-                        leetcode_username: data.leetcode_username,
-                        token: data.token
+                        // yeetcode_id: data._id,
+                        // yeetcode_username: data.yeetcode_username,
+                        // leetcode_username: data.leetcode_username,
+                        // token: data.token
+                        username: yeetcode_username,
+                        token: data_obj.data.token
                     }
                 }, function() {
                     // Redirect to main screen after successful login

@@ -14,35 +14,40 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server, path: "/ws" });
 
-// Store connected clients
-let clients = {};
+// Map of gameId → array of connected clients
+const gameRooms = {}; 
 
-// WebSocket connection handling
 wss.on("connection", (ws) => {
     console.log("New WebSocket connection");
 
     ws.on("message", (message) => {
         const data = JSON.parse(message);
-        
-        if (data.type === "CREATE_GAME") {
-            clients[data.gameId] = ws;
+
+        const { gameId, invitation_code } = data;
+
+        // Register the client in its game room
+        if (!gameRooms[gameId]) {
+            gameRooms[gameId] = [];
         }
 
-        if (data.type === "PLAYER_JOINED") {
-            if (clients[data.gameId]) {
-                clients[data.gameId].send(JSON.stringify(data));
-            }
+        if (!gameRooms[gameId].includes(ws)) {
+            gameRooms[gameId].push(ws);
         }
 
-        if (data.type === "START_GAME") {
-            if (clients[data.gameId]) {
-                clients[data.gameId].send(JSON.stringify(data));
+        // Broadcast to all clients in that game room
+        if (["PLAYER_JOINED", "START_GAME"].includes(data.type)) {
+            const room = gameRooms[gameId] || [];
+            for (let client of room) {
+                if (client.readyState === ws.OPEN) {
+                    client.send(JSON.stringify(data));
+                }
             }
         }
     });
 
     ws.on("close", () => {
-        console.log("WebSocket closed");
+        // Optional: Clean up closed connections later
+        console.log("WebSocket connection closed");
     });
 });
 
