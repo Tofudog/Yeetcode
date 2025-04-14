@@ -107,6 +107,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     
     let gameId;
+    let gameConfigurations;
     let isPlayer2 = false;
     let pollInterval; // Move pollInterval to outer scope
 
@@ -315,6 +316,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     // If this is Player 1 (creator)
                     if (!storage.isPlayer2) {
                         console.log("Player 2 has joined! Updating UI...");
+                        localStorage.setItem("player2",data.player2)
 
                         // Update Player 2's name display
                         const player2Name = document.getElementById("player2Name");
@@ -375,6 +377,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     // Store game configuration in localStorage
                     localStorage.setItem("gameConfig", JSON.stringify(game.config));
                     localStorage.setItem("gameTime", game.config.timeLimit);
+                    // localStorage.setItem("opponent_player", )
                     
                     // Update game state
                     chrome.storage.local.set({
