@@ -1,7 +1,10 @@
 import generateRandomCode from "./code_generator.js";
 
-const BACKEND_API = "https://yeetcode-1.onrender.com";
-const socket = new WebSocket(BACKEND_API.replace(/^http/, "ws") + "/ws");
+// const BACKEND_API = "https://yeetcode-1.onrender.com";
+// const socket = new WebSocket(BACKEND_API.replace(/^http/, "ws") + "/ws");
+const BACKEND_API = "http://localhost:3000";
+const socket = new WebSocket("ws://localhost:3000/ws");
+
 
 document.addEventListener("DOMContentLoaded", function () {
     // UI Elements
