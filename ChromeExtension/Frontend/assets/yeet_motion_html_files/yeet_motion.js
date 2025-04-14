@@ -13,3 +13,12 @@ document.addEventListener('DOMContentLoaded', function() {
         loserTextElement.textContent = "Loser";
     }
 }); 
+
+// Add click event listener for the continue button
+document.addEventListener('DOMContentLoaded', function() {
+    const continueButton = document.getElementById('continue-button');
+    continueButton.addEventListener('click', function() {
+        // Navigate to the game over screen
+        window.location.href = 'rip_motion.html';
+    });
+}); 

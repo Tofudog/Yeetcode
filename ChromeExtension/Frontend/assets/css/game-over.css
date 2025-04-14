@@ -1,0 +1,159 @@
+.game-over-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+    text-align: center;
+}
+
+.players-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    width: 100%;
+}
+
+.player {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.vs-image {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #ff4444;
+    position: relative;
+    background-image: url('../images/vs.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.result-text {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin: 1rem 0;
+    color: #333;
+}
+
+.victory-text, .defeat-text {
+    font-size: 1.8rem;
+    margin-bottom: 2rem;
+    color: #666;
+}
+
+.result-image {
+    width: 300px;
+    height: 300px;
+    margin: 2rem 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.victory-animation, .defeat-animation {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.logo-container {
+    margin: 2rem 0;
+}
+
+.logo {
+    width: 120px;
+    height: auto;
+}
+
+#back-button {
+    background-color: #f0c14b;
+    color: #111;
+    padding: 12px 50px;
+    border: none;
+    border-radius: 25px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 1rem;
+}
+
+#back-button:hover {
+    background-color: #ddb347;
+}
+
+/* Animation for the result text */
+.result-text {
+    animation: popIn 0.5s ease-out;
+}
+
+.victory-text, .defeat-text {
+    animation: slideIn 0.5s ease-out;
+}
+
+.result-image {
+    animation: fadeIn 1s ease-out;
+}
+
+@keyframes popIn {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    70% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes slideIn {
+    0% {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .players-container {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .result-text {
+        font-size: 2rem;
+    }
+
+    .victory-text, .defeat-text {
+        font-size: 1.5rem;
+    }
+
+    .result-image {
+        width: 250px;
+        height: 250px;
+    }
+} 

@@ -99,6 +99,24 @@
                 transform: translateY(-40px); /* Move up further */
             }
         }
+
+        /* Style for the continue button */
+        .btn {
+            position: absolute;
+            bottom: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
@@ -106,6 +124,7 @@
         <div class="emoji">( っ'-')╮</div>
         <div id="loser-text" class="text"></div>
         <div class="yeet">Yeet!</div>
+        <button id="continue-button" class="btn">Continue</button>
     </div>
     <script src="yeet_motion.js"></script>
 </body>

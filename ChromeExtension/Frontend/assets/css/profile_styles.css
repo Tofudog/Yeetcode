@@ -9,20 +9,19 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
-    padding: 10px;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin-bottom: 25px;
+    padding: 5px 0;
 }
 
 .info-label {
     font-weight: bold;
     color: #333;
+    font-size: 1.1em;
 }
 
 .info-value {
     color: #666;
+    font-size: 1.1em;
 }
 
 .editable-container {

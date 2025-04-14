@@ -116,6 +116,24 @@
                 opacity: 1; /* Keep the right text visible */
             }
         }
+
+        /* Style for the continue button */
+        .btn {
+            position: absolute;
+            bottom: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
@@ -123,8 +141,8 @@
         <div class="emoji"></div> <!-- Emoji that changes -->
         <div class="text-left">לאו</div> <!-- Left part of the text -->
         <div class="text-right">נרדו</div> <!-- Right part of the text -->
-        <!-- Need to add JS file to split the loser username and -->
-        <!-- VERY NOTABLE CHANGE FOR GIT TESTING -->
+        <button id="continue-button" class="btn">Continue</button>
     </div>
+    <script src="motion.js"></script>
 </body>
 </html>

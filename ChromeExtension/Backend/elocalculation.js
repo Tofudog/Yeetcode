@@ -14,10 +14,6 @@ class Player {
       this.gamesPlayed = 0;  // Track number of games played
       this.lastActive = Date.now();  // Last active timestamp
   }
-
-  expectedScore(opponentElo) {
-      return this.elo;
-  }
   
   /**
    * Updates player rating based on game results and performance factors
@@ -27,66 +23,60 @@ class Player {
    * @param {number} questionsSolved - Number of questions solved
    * @param {string} difficulty - Problem difficulty level ('easy', 'medium', 'hard')
    * @param {number} time - Time taken in minutes
+   * @param {number} opponentElo - Opponent's ELO
    */
-  updateRating(result, hoursInactive, questions, questionsSolved, difficulty, time) {
-      // RD sequence decreases as player gains experience
-      const rdSequence = [20, 15, 12, 9, 6, 4, 3, 2, 1];
-      let index = Math.min(this.gamesPlayed, rdSequence.length - 1);
-      this.rd = rdSequence[index];
-      
-      // Question factor: Penalizes incomplete solutions
-      let questionFactor = 1.0;
-      if (result === 0) { // Player lost
-        let unansweredQuestions = questions - questionsSolved;
-        if (questionsSolved === 0) {
-          questionFactor = 1.2;  // Maximum penalty for no solutions
-        } else if (questionsSolved === unansweredQuestions) {
-          questionFactor = 0.8;  // Reduced penalty for solving all questions
-        } else {
-          questionFactor = 1 + (unansweredQuestions / questions) * 0.5; // Proportional penalty
-        }
+  updateRating(result, hoursInactive, questions, questionsSolved, difficulty, time, opponentElo) {
+    // RD sequence decreases as player gains experience
+    const rdSequence = [20, 15, 12, 9, 6, 4, 3, 2, 1];
+    let index = Math.min(this.gamesPlayed, rdSequence.length - 1);
+    this.rd = rdSequence[index];
+
+    // Question factor: Penalizes incomplete solutions
+    let questionFactor = 1.0;
+    if (result === 0) { // Player lost
+      let unansweredQuestions = questions - questionsSolved;
+      if (questionsSolved === 0) {
+        questionFactor = 1.2;
+      } else if (questionsSolved === unansweredQuestions) {
+        questionFactor = 0.8;
+      } else {
+        questionFactor = 1 + (unansweredQuestions / questions) * 0.5;
       }
-      
-      // Difficulty factor: Rewards solving harder problems
-      let difficultyFactor = 1.0;
-      if (difficulty === "easy") {
-        difficultyFactor = 0.8;    // Reduced impact for easy problems
-      } else if (difficulty === "medium") {
-        difficultyFactor = 1.0;    // Standard impact for medium problems
-      } else if (difficulty === "hard") {
-        difficultyFactor = 1.2;    // Increased impact for hard problems
-      }
-      
-      // Time factor: Penalizes slower solutions
-      let timeFactor = 0.5;  // Base time factor
-      if (time > 5) {
-        // For every 5 minutes above 5, add 0.05 to the time factor, up to 120 minutes
-        let additionalTime = Math.min(time - 5, 115); // Cap at 120 minutes
-        let additionalFactor = (additionalTime / 5) * 0.05;
-        timeFactor += additionalFactor;
-      }
-      
-      // Calculate final rating change with all factors
-      let ratingChange = Math.round(
-        this.rd * 15 * (result === 1 ? 1 : -1) * questionFactor * difficultyFactor * timeFactor
-      );
-      
-      this.elo = Math.round(this.elo + ratingChange);
-      this.gamesPlayed++;
-      this.lastActive = Date.now();
-      this.handleInactivity(hoursInactive);
     }
-  
-  /**
-   * Handles player inactivity by adjusting RD
-   * @param {number} hoursInactive - Hours since last activity
-   */
-  handleInactivity(hoursInactive) {
-      if (hoursInactive > 0) {
-          let weeksInactive = Math.floor(hoursInactive / (7 * 24));
-          this.rd = Math.min(50, this.rd + 3 * weeksInactive);  // Increase RD by 3 per week inactive
-      }
-  }    
+
+    // Difficulty factor
+    let difficultyFactor = 1.0;
+    if (difficulty === "easy") {
+      difficultyFactor = 0.8;
+    } else if (difficulty === "medium") {
+      difficultyFactor = 1.0;
+    } else if (difficulty === "hard") {
+      difficultyFactor = 1.2;
+    }
+
+    // Time factor
+    let timeFactor = 0.5;
+    if (time > 5) {
+      let additionalTime = Math.min(time - 5, 115);
+      let additionalFactor = (additionalTime / 5) * 0.05;
+      timeFactor += additionalFactor;
+    }
+
+    // Base rating change based on ELO difference
+    let eloDiff = Math.abs(this.elo - opponentElo);
+    let baseChange = 8 + Math.floor(eloDiff / 25);  // +1 for every 25 point difference
+    baseChange *= (result === 1 ? 1 : -1);  // win = positive, loss = negative
+
+    // Final rating change
+    let ratingChange = Math.round(
+      baseChange * this.rd * 0.2 * questionFactor * difficultyFactor * timeFactor
+    );
+
+    this.elo = Math.round(this.elo + ratingChange);
+    this.gamesPlayed++;
+    this.lastActive = Date.now();
+    this.handleInactivity(hoursInactive);
+  }
 }
 
 /**
