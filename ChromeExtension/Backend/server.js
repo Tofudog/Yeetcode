@@ -114,7 +114,7 @@ app.post('/api/validateUser', async (req, res) => {
 /**
  * Query for getting the problem info.
  * 
- * @return a list with two values: ls[0] gets the problem difficulty and ls[1] gets a boolean if the problem is premium (true) or not (false)
+ * @return an object type with three values: difficulty, isPaidOnly, and topicTags, a list of tags associated with the problem.
  */
 app.post('/api/leetcodeProblemInfo', async (req, res) =>{ 
   const {titleSlug} = req.body;
@@ -129,7 +129,7 @@ app.post('/api/leetcodeProblemInfo', async (req, res) =>{
   } catch(error) {
     console.error("Error fetching LeetCode submission details:", error);
     res.status(500).json({ error: "Internal server error" });
-    return []; 
+    return {}; 
   }
 })
 

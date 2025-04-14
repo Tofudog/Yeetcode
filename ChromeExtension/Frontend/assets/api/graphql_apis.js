@@ -54,6 +54,6 @@ export const getLeetCodeProblemInfo= async (titleSlug) => {
         return data;
     } catch(error) {
         console.error("Error: ", error);
-        return [];
+        return {};
     }
 }
