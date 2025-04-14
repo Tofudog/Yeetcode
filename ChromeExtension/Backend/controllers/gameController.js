@@ -15,10 +15,13 @@ export const getAllGames = async (req, res) => {
 // Create a new game
 export const createGame = async (req, res) => {
   try {
-    const { invitation_code, username } = req.body;
+    const { invitation_code, player_1 } = req.body;
 
     if (!invitation_code) {
       return res.status(400).json({ message: 'invitation_code is required' });
+    }
+    if (!player_1) {
+      return res.status(400).json({ message: 'player_1\'s username is required' });
     }
 
     // Check if invitation_code already exists
@@ -28,8 +31,8 @@ export const createGame = async (req, res) => {
     }
 
     const newGame = new Game({
-      invitation_code,
-      player_1: username
+      invitation_code: invitation_code,
+      player_1: player_1
     });
 
     await newGame.save();
@@ -76,7 +79,7 @@ export const joinGame = async (req, res) => {
 export const updateGame = async (req, res) => {
   try {
     const gameId = req.params.id;
-    const { player_1, player_2, invitation_code, status } = req.body;
+    const { player_1, player_2, invitation_code, status, configurations } = req.body;
 
     const game = await Game.findById(gameId);
     if (!game) {
@@ -88,6 +91,7 @@ export const updateGame = async (req, res) => {
     if (player_2 !== undefined) game.player_2 = player_2;
     if (invitation_code !== undefined) game.invitation_code = invitation_code;
     if (status !== undefined) game.status = status;
+    if (configurations !== undefined) game.configurations = configurations;
 
     await game.save();
     res.status(200).json(game);
@@ -96,7 +100,6 @@ export const updateGame = async (req, res) => {
     res.status(500).json({ message: 'Failed to update game', error });
   }
 };
-
 
 // Update game status
 export const updateGameStatus = async (req, res) => {
