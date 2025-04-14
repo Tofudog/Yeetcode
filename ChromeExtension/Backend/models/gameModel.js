@@ -28,7 +28,7 @@ const GameSchema = new mongoose.Schema({
     enum: ['waiting', 'paired', 'in_progress', 'completed'],
     default: 'waiting'
   },
-  config: {
+  configurations: {
     difficulty: { type: String, default: null },
     numProblems: { type: Number, default: null },
     timeLimit: { type: Number, default: null },
@@ -39,7 +39,8 @@ const GameSchema = new mongoose.Schema({
       difficulty: String,
       difficultyLevel: Number,
       url: String
-    }]
+    }],
+    default:{}
   },
   code_expires_at: {
     type: Date,

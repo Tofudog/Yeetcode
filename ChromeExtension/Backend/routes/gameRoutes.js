@@ -10,7 +10,6 @@ router.post('/', createGame);
 router.post('/join', joinGame);
 router.patch('/:id', updateGame);
 router.patch('/:id/status', updateGameStatus);
-router.patch('/:id/config', updateGameConfig);
 router.delete('/', deleteAllGames); 
 
 export default router;
