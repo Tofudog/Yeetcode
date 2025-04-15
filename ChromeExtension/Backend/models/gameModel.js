@@ -28,20 +28,6 @@ const GameSchema = new mongoose.Schema({
     enum: ['waiting', 'paired', 'in_progress', 'completed'],
     default: 'waiting'
   },
-  configurations: {
-    difficulty: { type: String, default: null },
-    numProblems: { type: Number, default: null },
-    timeLimit: { type: Number, default: null },
-    battleType: { type: String, default: null },
-    questions: [{
-      id: String,
-      title: String,
-      difficulty: String,
-      difficultyLevel: Number,
-      url: String
-    }],
-    default:{}
-  },
   code_expires_at: {
     type: Date,
     default: () => Date.now() + 15 * 60 * 1000 // Expires in 15 minutes

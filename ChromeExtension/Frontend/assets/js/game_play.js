@@ -181,14 +181,108 @@ function updateSubmissionUI(submissions) {
 }
 
 // Initialize game when page loads
-document.addEventListener('DOMContentLoaded', () => {
-    console.log("Game play screen loaded");
+document.addEventListener("DOMContentLoaded", () => {
+    console.log("[GamePlay] Game play screen loaded");
     
-    // Listen for submission updates from background script
-    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-        if (message.type === 'submissionUpdate') {
-            console.log("Received submission update:", message.submissions);
-            updateSubmissionUI(message.submissions);
+    // Get game data from storage
+    chrome.storage.local.get([
+        "player_1",
+        "player_2",
+        "gameId",
+        "gameState",
+        "gameDifficulty",
+        "gameTime",
+        "gameProblems",
+        "gameProblemList"
+    ], (data) => {
+        console.log("[GamePlay] Retrieved game data:", data);
+        
+        if (!data.gameId || !data.player_1 || !data.player_2) {
+            console.error("[GamePlay] Missing required game data");
+            return;
         }
+        
+        // Display player names
+        document.getElementById("player1-name").textContent = data.player_1;
+        document.getElementById("player2-name").textContent = data.player_2;
+        
+        // Initialize game with stored settings
+        const gameSettings = {
+            difficulty: data.gameDifficulty || "medium",
+            timeLimit: data.gameTime || 30,
+            numProblems: data.gameProblems || 5,
+            problems: data.gameProblemList || []
+        };
+        
+        // If no problems are stored, generate new ones
+        if (!gameSettings.problems || gameSettings.problems.length === 0) {
+            console.log("[GamePlay] No stored problems found, generating new ones");
+            gameSettings.problems = generateRandomProblems(
+                gameSettings.difficulty,
+                gameSettings.numProblems
+            );
+            
+            // Store the generated problems
+            chrome.storage.local.set({
+                gameProblemList: gameSettings.problems,
+                gameDifficulty: gameSettings.difficulty,
+                gameTime: gameSettings.timeLimit,
+                gameProblems: gameSettings.numProblems
+            });
+        }
+        
+        // Initialize game UI with settings
+        initializeGameUI(gameSettings);
+        
+        // Start WebSocket connection
+        initializeWebSocket(data.gameId);
     });
+});
+
+function initializeGameUI(settings) {
+    console.log("[GamePlay] Initializing game UI with settings:", settings);
+    
+    // Set up timer
+    const timerElement = document.getElementById("timer");
+    let timeLeft = settings.timeLimit;
+    timerElement.textContent = timeLeft;
+    
+    // Set up problem display
+    const problemContainer = document.getElementById("problem-container");
+    const currentProblem = settings.problems[0];
+    problemContainer.innerHTML = `
+        <h3>Problem ${1}/${settings.numProblems}</h3>
+        <p>${currentProblem.description}</p>
+        <textarea id="solution-input" placeholder="Write your solution here..."></textarea>
+    `;
+    
+    // Start timer
+    const timer = setInterval(() => {
+        timeLeft--;
+        timerElement.textContent = timeLeft;
+        
+        if (timeLeft <= 0) {
+            clearInterval(timer);
+            // Handle time's up
+            handleTimeUp();
+        }
+    }, 1000);
+}
+
+function handleTimeUp() {
+    console.log("[GamePlay] Time's up!");
+    // Implement time's up logic
+}
+
+function initializeWebSocket(gameId) {
+    console.log("[GamePlay] Initializing WebSocket for game:", gameId);
+    // Implement WebSocket connection logic
+}
+
+// Listen for submission updates from background script
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.type === 'submissionUpdate') {
+        console.log("Received submission update:", message.submissions);
+        updateSubmissionUI(message.submissions);
+    }
 }); 

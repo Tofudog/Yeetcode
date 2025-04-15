@@ -9,61 +9,127 @@ document.addEventListener("DOMContentLoaded", () => {
         startGameButton.addEventListener("click", () => {
             console.log("Start game button clicked");
             
-            // Get game data from storage
-            chrome.storage.local.get(['user', 'player_2', 'gameId', 'invitation_code'], (result) => {
-                console.log("Retrieved game data from storage:", result);
-                
-                if (!result.user || !result.user.username) {
-                    console.error("User data not found in storage");
-                    alert("Error: User data not found. Please try logging in again.");
-                    return;
-                }
-                
-                if (!result.gameId) {
-                    console.error("Game ID not found in storage");
-                    alert("Error: Game ID not found. Please create a new game.");
-                    return;
-                }
-                
-                const player1Name = result.user.username;
-                const player2Name = result.player_2 || "Waiting for player...";
-                const gameId = result.gameId;
-                const invitation_code = result.invitation_code;
-                
-                console.log("Game data:", { player1Name, player2Name, gameId, invitation_code });
-
-                // Send message to background script to start the game
-                chrome.runtime.sendMessage({
-                    type: "START_GAME",
-                    gameId,
-                    invitation_code,
-                    player_1: player1Name,
-                    player_2: player2Name
-                }, (response) => {
-                    console.log("Response from background script:", response);
-                    
-                    if (chrome.runtime.lastError) {
-                        console.error("Error sending message to background script:", chrome.runtime.lastError);
-                        alert("Error starting game. Please try again.");
-                        return;
-                    }
-                    
-                    // Request navigation to game play screen
-                    chrome.runtime.sendMessage({
-                        type: "NAVIGATE_TO_GAME"
-                    }, (navResponse) => {
-                        console.log("Navigation response:", navResponse);
-                        
-                        if (chrome.runtime.lastError) {
-                            console.error("Error navigating to game screen:", chrome.runtime.lastError);
-                            // Fallback to direct navigation
-                            window.location.href = "game-play-screen.html";
-                        }
-                    });
-                });
+            // Get selected settings from the UI
+            const selectedDifficulty = document.querySelector('.difficulty-btn.active').id.replace('-btn', '');
+            const problemPicker = document.getElementById('problem-picker');
+            const timePicker = document.getElementById('time-picker');
+            const selectedProblems = parseInt(problemPicker.getAttribute('data-value'));
+            const selectedTime = parseInt(timePicker.getAttribute('data-value'));
+            
+            console.log("Selected settings:", { 
+                selectedDifficulty, 
+                selectedProblems, 
+                selectedTime 
             });
+            
+            // Generate random problems based on settings
+            generateRandomProblems(selectedProblems, selectedDifficulty)
+                .then(problems => {
+                    console.log("Generated problems:", problems);
+                    
+                    // Get game data from storage
+                    chrome.storage.local.get(['user', 'player_2', 'gameId', 'invitation_code'], (result) => {
+                        console.log("Retrieved game data from storage:", result);
+                        
+                        if (!result.user || !result.user.username) {
+                            console.error("User data not found in storage");
+                            alert("Error: User data not found. Please try logging in again.");
+                            return;
+                        }
+                        
+                        if (!result.gameId) {
+                            console.error("Game ID not found in storage");
+                            alert("Error: Game ID not found. Please create a new game.");
+                            return;
+                        }
+                        
+                        const player1Name = result.user.username;
+                        const player2Name = result.player_2 || "Waiting for player...";
+                        const gameId = result.gameId;
+                        const invitation_code = result.invitation_code;
+                        
+                        console.log("Game data:", { player1Name, player2Name, gameId, invitation_code });
+                        
+                        // Store settings and problems in chrome.storage
+                        chrome.storage.local.set({
+                            'gameDifficulty': selectedDifficulty,
+                            'gameTime': selectedTime,
+                            'gameProblems': selectedProblems,
+                            'gameProblemList': problems
+                        }, () => {
+                            console.log("Game settings and problems stored in chrome.storage");
+                            
+                            // Send message to background script to start the game
+                            chrome.runtime.sendMessage({
+                                type: "START_GAME",
+                                gameId,
+                                invitation_code,
+                                player_1: player1Name,
+                                player_2: player2Name,
+                                gameSettings: {
+                                    difficulty: selectedDifficulty,
+                                    numProblems: selectedProblems,
+                                    timeLimit: selectedTime,
+                                    problems: problems
+                                },
+                                sender: {
+                                    tabId: chrome.runtime.id
+                                }
+                            }, (response) => {
+                                console.log("Response from background script:", response);
+                                
+                                if (chrome.runtime.lastError) {
+                                    console.error("Error sending message to background script:", chrome.runtime.lastError);
+                                    alert("Error starting game. Please try again.");
+                                    return;
+                                }
+                                
+                                // Request navigation to game play screen
+                                chrome.runtime.sendMessage({
+                                    type: "NAVIGATE_TO_GAME"
+                                }, (navResponse) => {
+                                    console.log("Navigation response:", navResponse);
+                                    
+                                    if (chrome.runtime.lastError) {
+                                        console.error("Error navigating to game screen:", chrome.runtime.lastError);
+                                        // Fallback to direct navigation
+                                        window.location.href = "game-play-screen.html";
+                                    }
+                                });
+                            });
+                        });
+                    });
+                })
+                .catch(error => {
+                    console.error("Error generating problems:", error);
+                    alert("Error generating problems. Please try again.");
+                });
         });
     } else {
         console.error("Start game button not found");
     }
 });
+
+// Function to generate random problems
+async function generateRandomProblems(numProblems, difficulty) {
+    try {
+        // Load problems from JSON file
+        const response = await fetch('assets/data/problems.json');
+        const data = await response.json();
+        const allProblems = data[difficulty] || [];
+        
+        console.log(`Loaded ${allProblems.length} problems for difficulty: ${difficulty}`);
+        
+        // Randomly select problems based on count
+        const selectedProblems = allProblems
+            .sort(() => Math.random() - 0.5)
+            .slice(0, numProblems);
+        
+        console.log(`Selected ${selectedProblems.length} problems out of ${allProblems.length} available`);
+        
+        return selectedProblems;
+    } catch (error) {
+        console.error('Error generating problems:', error);
+        throw error;
+    }
+}

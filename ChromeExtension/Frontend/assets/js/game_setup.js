@@ -168,11 +168,24 @@ document.addEventListener('DOMContentLoaded', () => {
         // Send START_GAME message to both players
         sendWebSocketMessage({
           type: 'START_GAME',
-          gameId: gameState.gameId
+          gameId: gameState.gameId,
+          sender: {
+            tabId: chrome.runtime.id
+          }
         });
 
-        // Navigate to game play screen
-        window.location.href = 'game-play-screen.html';
+        // Request navigation to game play screen
+        chrome.runtime.sendMessage({
+          type: "NAVIGATE_TO_GAME"
+        }, (response) => {
+          console.log("Navigation response:", response);
+          
+          if (chrome.runtime.lastError) {
+            console.error("Error navigating to game screen:", chrome.runtime.lastError);
+            // Fallback to direct navigation
+            window.location.href = 'game-play-screen.html';
+          }
+        });
 
       } catch (error) {
         console.log('Error starting game:', error);

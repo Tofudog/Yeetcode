@@ -363,11 +363,26 @@ document.addEventListener("DOMContentLoaded", function () {
                     gameId,
                     invitation_code,
                     player_1: player1Name,
-                    player_2: player2Name
+                    player_2: player2Name,
+                    sender: {
+                        tabId: chrome.runtime.id
+                    }
                 });
         
-                // Navigate Player 1 to play screen
-                window.location.href = "game-play-screen.html"
+                // Request navigation to game play screen
+                chrome.runtime.sendMessage({
+                    type: "NAVIGATE_TO_GAME"
+                }, (response) => {
+                    console.log("[Popup] Navigation response:", response);
+                    
+                    if (chrome.runtime.lastError) {
+                        console.error("[Popup] Error navigating to game screen:", chrome.runtime.lastError);
+                        // Fallback to direct navigation only if necessary
+                        if (!window.location.href.includes("game-play-screen.html")) {
+                            window.location.href = "game-play-screen.html";
+                        }
+                    }
+                });
             });
         });        
     }
