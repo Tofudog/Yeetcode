@@ -321,9 +321,7 @@ document.addEventListener("DOMContentLoaded", function () {
     
             fetch(`${BACKEND_API}/api/games/${data.gameId}`)
                 .then(response => response.json())
-                .then(game => {
-                    // TODO: save game config to local storage
-    
+                .then(game => {    
                     chrome.storage.local.set({
                         gameState: {
                             gameId: data.gameId,

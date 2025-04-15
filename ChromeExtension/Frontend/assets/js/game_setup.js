@@ -138,31 +138,34 @@ document.addEventListener('DOMContentLoaded', () => {
         // Generate random questions based on difficulty
         const questions = generateRandomQuestions(selectedProblems, selectedDifficulty);
 
-        // Create game configuration
-        const gameConfig = {
-          difficulty: selectedDifficulty,
-          numProblems: selectedProblems,
-          timeLimit: selectedTime,
-          battleType: selectedBattleType,
-          questions: questions
+        // Create game settings object matching the exact API format
+        const requestBody = {
+            game_settings: {
+                difficulty: selectedDifficulty,
+                time_limit: selectedTime,
+                selected_problems: questions.map(q => q.title),
+                problem_count: selectedProblems
+            }
         };
 
-        // Update game configuration in backend
-        await fetch(`${BACKEND_API}/api/games/${gameState.gameId}/config`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ config: gameConfig })
+        // Update game settings using the exact API endpoint
+        const response = await fetch(`${BACKEND_API}/api/games/${gameState.gameId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(requestBody)
         });
 
-        // Update game status on backend
-        await fetch(`${BACKEND_API}/api/games/${gameState.gameId}/status`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ status: 'in_progress' })
-        });
+        if (!response.ok) {
+            throw new Error('Failed to update game settings');
+        }else{
+          alert("UPDATING BACKEND WORKED")
+        }
+
+        const updatedGame = await response.json();
+        console.log('Game settings updated successfully:', updatedGame);
 
         // Store game configuration in localStorage for game play screen
-        localStorage.setItem("gameConfig", JSON.stringify(gameConfig));
+        localStorage.setItem("gameConfig", JSON.stringify(requestBody.game_settings));
         localStorage.setItem("gameTime", selectedTime);
 
         // Send START_GAME message to both players

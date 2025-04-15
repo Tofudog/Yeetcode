@@ -2,8 +2,8 @@
 let player1Name = "";
 let player2Name = "";
 let selectedDifficulty = "easy";
-let selectedTime = 60;
-let selectedProblemCount = 5;
+let selectedTime = 0;
+let selectedProblemCount = 0;
 
 // Initialize game data from storage
 chrome.storage.local.get(['gameState', 'user', 'player_1', 'player_2', 'gameStarted'], (result) => {
