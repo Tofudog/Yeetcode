@@ -71,3 +71,41 @@ export const validateUser = async (username) =>{
       return false;
     }
 }
+
+export const getLeetCodeProblemInfo = async (titleSlug) => {
+    titleSlug = titleSlug.toLowerCase();
+    titleSlug = titleSlug.trim()
+
+    const query = `
+        query getProblemInfo($titleSlug: String!) {
+            question(titleSlug: $titleSlug) {
+                difficulty
+                isPaidOnly
+                categoryTitle
+            }
+        }
+    `;
+
+    try{
+        const response = await fetch("https://leetcode.com/graphql", {
+            method: "POST",
+            headers: {
+            "Content-Type": "application/json", // we're sending JSON-formatted data here.
+            },
+          body: JSON.stringify({ query, variables: { titleSlug } }),
+          });
+
+        const data = await response.json();
+
+        var difficulty = data.data.question.difficulty;
+        var isPaidOnly = data.data.question.isPaidOnly;
+        var category = data.data.question.categoryTitle;
+
+        var problemInfo = [difficulty, isPaidOnly, category];
+
+        return problemInfo
+    } catch(error) {
+        console.log(error);
+        return false; 
+    }
+}
