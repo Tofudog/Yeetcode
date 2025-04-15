@@ -2,8 +2,8 @@
 const problemOptions = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 const timeOptions = [5, 10, 15, 20, 30, 60];
 
-const BACKEND_API = "https://yeetcode-1.onrender.com";
-const socket = new WebSocket(BACKEND_API.replace(/^http/, "ws") + "/ws");
+const BACKEND_API = "http://localhost:3000";
+const socket = new WebSocket("ws://localhost:3000/ws");
 
 // Add connection state tracking
 let isSocketConnected = false;
