@@ -82,26 +82,30 @@ export const joinGame = async (req, res) => {
 // Update game
 export const updateGame = async (req, res) => {
   try {
-    const gameId = req.params.id;
-    const { player_1, player_2, invitation_code, status, configurations } = req.body;
+    const { id } = req.params;
+    const updateData = req.body;
 
-    const game = await Game.findById(gameId);
+    // Remove any undefined or null values from updateData
+    Object.keys(updateData).forEach(key => {
+      if (updateData[key] === undefined || updateData[key] === null) {
+        delete updateData[key];
+      }
+    });
+
+    const game = await Game.findByIdAndUpdate(
+      id,
+      { $set: updateData },
+      { new: true }
+    );
+
     if (!game) {
       return res.status(404).json({ message: 'Game not found' });
     }
 
-    // Merge any fields provided in the request
-    if (player_1 !== undefined) game.player_1 = player_1;
-    if (player_2 !== undefined) game.player_2 = player_2;
-    if (invitation_code !== undefined) game.invitation_code = invitation_code;
-    if (status !== undefined) game.status = status;
-    if (configurations !== undefined) game.configurations = configurations;
-
-    await game.save();
-    res.status(200).json(game);
+    res.json(game);
   } catch (error) {
     console.error('Error updating game:', error);
-    res.status(500).json({ message: 'Failed to update game', error });
+    res.status(500).json({ message: 'Error updating game', error: error.message });
   }
 };
 
@@ -160,5 +164,32 @@ export const getGameById = async (req, res) => {
     res.status(200).json(game);
   } catch (error) {
     res.status(500).json({ message: 'Error retrieving game', error });
+  }
+};
+
+export const updateGameSettings = async (req, res) => {
+  try {
+    const { gameId } = req.params;
+    const { difficulty, time_limit, selected_problems, problem_count } = req.body;
+
+    const game = await Game.findById(gameId);
+    if (!game) {
+      return res.status(404).json({ message: 'Game not found' });
+    }
+
+    // Update game settings
+    game.game_settings = {
+      ...game.game_settings,
+      ...(difficulty && { difficulty }),
+      ...(time_limit && { time_limit }),
+      ...(selected_problems && { selected_problems }),
+      ...(problem_count && { problem_count })
+    };
+
+    await game.save();
+    res.json(game);
+  } catch (error) {
+    console.error('Error updating game settings:', error);
+    res.status(500).json({ message: 'Error updating game settings', error: error.message });
   }
 };

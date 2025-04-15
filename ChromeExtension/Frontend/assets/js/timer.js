@@ -9,6 +9,9 @@ const NUM_USERS = 2;
 var numMinutes = parseInt(localStorage.getItem("gameTime")) || 10;
 var numSeconds = 0;
 
+// Convert minutes to seconds for the timer
+var totalSeconds = (numMinutes * 60) + numSeconds;
+
 const gameOverPage = "assets/yeet_motion_html_files/yeet_motion.html";
 const gameOverPage2 = "assets/yeet_motion_html_files/rip_motion.html";
 
@@ -74,10 +77,26 @@ function handleGameOver() {
     }, 100);
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-    // Initialize timer display with selected time
+// Initialize timer display
+document.getElementById("timerText").innerText = timeFormated(numMinutes, numSeconds);
+
+// Update timer every second
+var intervalTimer = setInterval(async function() {
+    if (numSeconds === 0) {
+        if (numMinutes === 0) {
+            // Time's up - determine winner
+            handleGameOver();
+            return;
+        }
+        numMinutes--;
+        numSeconds = 59;
+    } else {
+        numSeconds--;
+    }
+    
+    // Update timer display
     document.getElementById("timerText").innerText = timeFormated(numMinutes, numSeconds);
-});
+}, 1000);
 
 function getNextTime(minutes, seconds) {
     //precondition: minutes and/or seconds > 0
@@ -94,13 +113,7 @@ function getNextTime(minutes, seconds) {
 }
 
 function timeFormated(minutes, seconds) {
-    //0 <= minutes, seconds < 60
-    var timeOutput = ``;
-    if (minutes < 10) {timeOutput += `0`;}
-    timeOutput += `${minutes}:`;
-    if (seconds < 10) {timeOutput += `0`;}
-    timeOutput += `${seconds}`;
-    return timeOutput;
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 }
 
 function titleToSlug(title) {

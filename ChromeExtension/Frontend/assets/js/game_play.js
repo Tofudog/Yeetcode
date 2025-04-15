@@ -59,7 +59,11 @@ function initializeWithSettings() {
         console.log("Retrieved game settings:", settingsResult);
         
         if (settingsResult.gameDifficulty) selectedDifficulty = settingsResult.gameDifficulty;
-        if (settingsResult.gameTime) selectedTime = settingsResult.gameTime;
+        if (settingsResult.gameTime) {
+            selectedTime = settingsResult.gameTime;
+            // Store time in localStorage for timer.js
+            localStorage.setItem("gameTime", selectedTime);
+        }
         if (settingsResult.gameProblems) selectedProblemCount = settingsResult.gameProblems;
         
         // Initialize the game table with the retrieved data

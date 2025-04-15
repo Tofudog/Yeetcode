@@ -35,6 +35,25 @@ const GameSchema = new mongoose.Schema({
   score: {
     player_1: { type: Number, default: 0 },
     player_2: { type: Number, default: 0 }
+  },
+  // New game settings fields
+  game_settings: {
+    difficulty: {
+      type: String,
+      enum: ['easy', 'medium', 'hard'],
+      default: 'medium'
+    },
+    time_limit: {
+      type: Number,
+      default: 30 // Default 30 minutes
+    },
+    selected_problems: [{
+      type: String // Array of problem slugs
+    }],
+    problem_count: {
+      type: Number,
+      default: 5
+    }
   }
 }, { timestamps: true });
 
