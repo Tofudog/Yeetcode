@@ -2,6 +2,32 @@
 const problemOptions = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 const timeOptions = [5, 10, 15, 20, 30, 60];
 
+const BACKEND_API = "https://yeetcode-1.onrender.com";
+const socket = new WebSocket(BACKEND_API.replace(/^http/, "ws") + "/ws");
+
+// Add connection state tracking
+let isSocketConnected = false;
+
+socket.onopen = () => {
+    console.log("WebSocket connected");
+    isSocketConnected = true;
+};
+
+socket.onclose = () => {
+    console.log("WebSocket disconnected");
+    isSocketConnected = false;
+};
+
+// Helper function to send WebSocket messages
+function sendWebSocketMessage(message) {
+    if (isSocketConnected) {
+        socket.send(JSON.stringify(message));
+    } else {
+        console.log("WebSocket not connected, retrying in 1 second...");
+        setTimeout(() => sendWebSocketMessage(message), 1000);
+    }
+}
+
 // Function to dynamically generate picker items
 function generatePickerItems(pickerId, options, formatFn = (val) => val) {
   const pickerItemsContainer = document.querySelector(`#${pickerId} .picker-items`);
@@ -87,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Start button
-  const startBtn = document.getElementById("start-btn");
+  const startBtn = document.getElementById("start-game-button");
   if (startBtn) {
     startBtn.addEventListener("click", async function() {
       try {
@@ -97,59 +123,99 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (!gameState) {
-          console.error('No game state found');
+          console.log('No game state found');
           return;
         }
 
-        // Get selected options
-        const difficulty = document.querySelector('.difficulty-btn.active').textContent.toLowerCase();
-        const problemCount = document.getElementById('problem-picker').getAttribute('data-value');
-        const timeLimit = document.getElementById('time-picker').getAttribute('data-value');
-        const battleType = document.querySelector('.battle-type-btn.active').textContent.toLowerCase();
+        // Get selected values
+        const problemPicker = document.getElementById('problem-picker');
+        const timePicker = document.getElementById('time-picker');
+        const selectedProblems = parseInt(problemPicker.getAttribute('data-value'));
+        const selectedTime = parseInt(timePicker.getAttribute('data-value'));
+        const selectedDifficulty = document.querySelector('.difficulty-btn.active').id.replace('-btn', '');
+        const selectedBattleType = document.querySelector('.battle-type-btn.active').id.replace('-btn', '');
 
-        // Store game settings
-        localStorage.setItem('gameDifficulty', difficulty);
-        localStorage.setItem('gameProblems', problemCount);
-        localStorage.setItem('gameTime', timeLimit);
-        localStorage.setItem('battleType', battleType);
+        // Generate random questions based on difficulty
+        const questions = generateRandomQuestions(selectedProblems, selectedDifficulty);
 
-        // Update game status on the backend
-        await fetch(`http://localhost:3000/api/games/${gameState.gameId}/status`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ 
-            status: "in_progress", 
-            player_1: gameState.player1,
-            settings: {
-              difficulty,
-              problemCount,
-              timeLimit,
-              battleType
-            }
-          })
+        // Create game configuration
+        const gameConfig = {
+          difficulty: selectedDifficulty,
+          numProblems: selectedProblems,
+          timeLimit: selectedTime,
+          battleType: selectedBattleType,
+          questions: questions
+        };
+
+        // Update game configuration in backend
+        await fetch(`${BACKEND_API}/api/games/${gameState.gameId}/config`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ config: gameConfig })
         });
 
-        // Send WebSocket message about game start
-        const socket = new WebSocket("ws://localhost:3000/ws");
-        socket.onopen = () => {
-          socket.send(JSON.stringify({ 
-            type: "START_GAME", 
-            gameId: gameState.gameId,
-            settings: {
-              difficulty,
-              problemCount,
-              timeLimit,
-              battleType
-            }
-          }));
+        // Update game status on backend
+        await fetch(`${BACKEND_API}/api/games/${gameState.gameId}/status`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: 'in_progress' })
+        });
+
+        // Store game configuration in localStorage for game play screen
+        localStorage.setItem("gameConfig", JSON.stringify(gameConfig));
+        localStorage.setItem("gameTime", selectedTime);
+
+        // Send START_GAME message to both players
+        sendWebSocketMessage({
+          type: 'START_GAME',
+          gameId: gameState.gameId,
+          sender: {
+            tabId: chrome.runtime.id
+          }
+        });
+
+        // Request navigation to game play screen
+        chrome.runtime.sendMessage({
+          type: "NAVIGATE_TO_GAME"
+        }, (response) => {
+          console.log("Navigation response:", response);
           
-          // Navigate to game play screen
-          window.location.href = "game-play-screen.html";
-        };
-      } catch (err) {
-        console.error("Failed to start game:", err);
+          if (chrome.runtime.lastError) {
+            console.error("Error navigating to game screen:", chrome.runtime.lastError);
+            // Fallback to direct navigation
+            window.location.href = 'game-play-screen.html';
+          }
+        });
+
+      } catch (error) {
+        console.log('Error starting game:', error);
+        alert('Failed to start game. Please try again.');
       }
     });
+  }
+
+  // Function to generate random questions
+  function generateRandomQuestions(numProblems, difficulty) {
+    // This is a placeholder - you'll need to implement the actual question generation logic
+    const questions = [];
+    const difficultyMap = {
+      'easy': 1,
+      'medium': 2,
+      'hard': 3
+    };
+
+    // For now, just generate placeholder questions
+    for (let i = 0; i < numProblems; i++) {
+      questions.push({
+        id: `problem-${i + 1}`,
+        title: `Problem ${i + 1}`,
+        difficulty: difficulty,
+        difficultyLevel: difficultyMap[difficulty],
+        url: `https://leetcode.com/problems/placeholder-${i + 1}`
+      });
+    }
+
+    return questions;
   }
 });
   

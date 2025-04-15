@@ -77,3 +77,88 @@ if (!findSubmitButtonAndAddListener()) {
 } else {
     console.log("Yeetcode Content Script: Button found immediately on load.");
 }
+console.log("[ContentScript] Content script loaded");
+
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+    console.log("[ContentScript] Received message:", msg);
+    
+    if (msg.type === "START_GAME") {
+        console.log("[ContentScript] Received START_GAME message", msg);
+
+        try {
+            // Prepare storage data
+            const storageData = {
+                // Format 1: As gameState object
+                gameState: {
+                    gameId: msg.gameId,
+                    player_1: msg.player_1,
+                    player_2: msg.player_2,
+                    status: "in_progress"
+                },
+                // Format 2: As direct properties
+                player_1: msg.player_1,
+                player_2: msg.player_2,
+                gameId: msg.gameId,
+                gameStarted: true
+            };
+            
+            // Add game settings if provided
+            if (msg.gameSettings) {
+                storageData.gameDifficulty = msg.gameSettings.difficulty;
+                storageData.gameTime = msg.gameSettings.timeLimit;
+                storageData.gameProblems = msg.gameSettings.numProblems;
+                storageData.gameProblemList = msg.gameSettings.problems;
+                
+                // Also add to gameState
+                storageData.gameState.settings = {
+                    difficulty: msg.gameSettings.difficulty,
+                    timeLimit: msg.gameSettings.timeLimit,
+                    numProblems: msg.gameSettings.numProblems,
+                    problems: msg.gameSettings.problems
+                };
+            }
+            
+            // Store game data in multiple formats for better compatibility
+            chrome.storage.local.set(storageData, () => {
+                console.log("[ContentScript] Game data and settings stored in multiple formats");
+                
+                // Also store in localStorage for immediate access
+                localStorage.setItem("Player1", msg.player_1);
+                localStorage.setItem("Player2", msg.player_2);
+                
+                if (msg.gameSettings) {
+                    localStorage.setItem("gameDifficulty", msg.gameSettings.difficulty);
+                    localStorage.setItem("gameTime", msg.gameSettings.timeLimit);
+                    localStorage.setItem("gameProblems", msg.gameSettings.numProblems);
+                    localStorage.setItem("gameProblemList", JSON.stringify(msg.gameSettings.problems));
+                }
+                
+                console.log("[ContentScript] Game data stored in localStorage");
+                
+                // Request navigation to game play screen
+                chrome.runtime.sendMessage({
+                    type: "NAVIGATE_TO_GAME"
+                }, (response) => {
+                    console.log("[ContentScript] Navigation response:", response);
+                    
+                    if (chrome.runtime.lastError) {
+                        console.error("[ContentScript] Error navigating to game screen:", chrome.runtime.lastError);
+                        // Fallback to direct navigation only if necessary
+                        if (!window.location.href.includes("game-play-screen.html")) {
+                            window.location.href = "game-play-screen.html";
+                        }
+                    }
+                });
+            });
+            
+            // Send response back to background script
+            sendResponse({ status: "redirecting" });
+        } catch (error) {
+            console.error("[ContentScript] Error handling START_GAME message:", error);
+            sendResponse({ status: "error", message: error.message });
+        }
+    }
+    
+    // Return true to indicate we'll send a response asynchronously
+    return true;
+});

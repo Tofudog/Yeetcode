@@ -188,3 +188,15 @@ input {
 #toggle-note-checkbox:checked ~ #note-header #toggle-note-button {
     transform: rotate(180deg);
 }
+
+/* Create TEAM Page */
+.username-display {
+    padding: 8px;
+    background-color: #f5f5f5;
+    border-radius: 5px;
+    margin: 5px 0;
+}
+
+.player-info {
+    margin: 10px 0;
+}
