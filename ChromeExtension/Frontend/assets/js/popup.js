@@ -1,4 +1,4 @@
-import generateRandomCode from "./code_generator.js";
+import generateRandomCode from "./codeGenerator.js";
 
 
 const socket = new WebSocket("ws://localhost:3000/ws");
@@ -66,8 +66,8 @@ document.addEventListener("DOMContentLoaded", function () {
     if (createTeamButton) {
 
         createTeamButton.addEventListener("click", () => {
-            localStorage.clear();
-            chrome.storage.local.clear();
+            //localStorage.clear();
+            //chrome.storage.local.clear();
             window.location.href = "create-team-screen.html";
         });
     }

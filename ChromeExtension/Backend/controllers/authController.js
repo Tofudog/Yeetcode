@@ -35,7 +35,12 @@ const signin = async (req, res) => {
       if(!isMatch) return res.status(401).json({success: false, message: "Invalid Credentials" });
   
       const token = sign({ _id: user.yeetcode_username, name: user.leetcode_username }, process.env.JWT_KEY, { expiresIn: '1h' });
-      return res.status(200).json({success: true, data: { token } });
+      return res.status(200).json({
+        success: true,
+        data: { token },
+        leetcode_username: user.leetcode_username,
+        yeetcode_username: yeetcode_username
+      });
   
   }
   
