@@ -8,9 +8,6 @@ import userRoutes from './routes/userRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import { fetchRecentSubmissions } from './utils/leetcodeGraphQLQueries.js';
 import { validateUser } from './utils/leetcodeGraphQLQueries.js';
-import { deleteAllUsers } from './controllers/userController.js';
-import Game from './models/gameModel.js';
-import { send } from 'process';
 
 const app = express();
 const server = http.createServer(app);
@@ -97,25 +94,6 @@ connectDB();
 app.use('/api/users', userRoutes);
 app.use('/api/games', gameRoutes);
 app.use('/api/auth', authRoutes);
-
-// //<!-------------------Listening for updates for Leetcode Problems----------->
-// Game.watch([
-//   {
-//     $match: {
-//       operationType: 'update',
-//       'updateDescription.updatedFields.leetcodeProblems': { $exists: true }
-//     }
-//   }
-// ]).on('change', (change) => {
-//   const gameId = change.documentKey._id;
-//   const updatedProblems = change.updateDescription.updatedFields.leetcodeProblems;
-
-//   const message = JSON.stringify({
-//     type: 'LEETCODE_PROBLEMS_UPDATED',
-//     gameId,
-//     leetcodeProblems: updatedProblems
-//   });
-// })
 
 //<!--------------------GraphQL Queries---------------------!>
 
