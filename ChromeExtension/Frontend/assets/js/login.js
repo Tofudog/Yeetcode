@@ -32,6 +32,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (response.ok) {
                 // Store user data in chrome storage
+                localStorage.setItem("leetcode_username", data.leetcode_username);
+                localStorage.setItem("yeetcode_username", data.yeetcode_username);
                 chrome.storage.local.set({
                     user: {
                         yeetcode_id: data._id,

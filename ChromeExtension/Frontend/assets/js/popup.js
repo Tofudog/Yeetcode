@@ -66,8 +66,12 @@ document.addEventListener("DOMContentLoaded", function () {
     if (createTeamButton) {
 
         createTeamButton.addEventListener("click", () => {
+            const leetcode_username = localStorage.getItem("leetcode_username");
+            const yeetcode_username = localStorage.getItem("yeetcode_username");
             localStorage.clear();
             chrome.storage.local.clear();
+            localStorage.setItem("leetcode_username", leetcode_username);
+            localStorage.setItem("yeetcode_username", yeetcode_username);
             window.location.href = "create-team-screen.html";
         });
     }
