@@ -1,8 +1,5 @@
-import updateSubmission from "../../../Backend/utils/gameLoop.js";
 import { userRecentSubmissions } from "../api/graphql_apis.js";
 
-const CHECKING_IF_PASSED = true; //Can change this to true if want to check a submission passed
-const CYCLE_AMOUNT = 15; //Number of seconds per API Call
 const NUM_USERS = 2;
 
 // Initialize time from localStorage or default to 10 minutes
@@ -10,7 +7,6 @@ var numMinutes = parseInt(localStorage.getItem("gameTime")) || 10;
 var numSeconds = 0;
 
 const gameOverPage = "assets/yeet_motion_html_files/yeet_motion.html";
-const gameOverPage2 = "assets/yeet_motion_html_files/rip_motion.html";
 
 // Function to count completed problems for a player
 function countCompletedProblems(playerIndex) {

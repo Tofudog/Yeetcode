@@ -1,16 +1,13 @@
 // Get selected options from localStorage
-
 const player1Name = localStorage.getItem("Player1");
 const player2Name = localStorage.getItem("Player2");
 const gameId = localStorage.getItem("gameId");
-
 
 // Track selected problems for submission checking
 let selectedProblems = [];
 
 // Get game settings from storage
 let selectedProblemCount;
-
 
 async function getGameSettings() {
     try {
@@ -42,7 +39,6 @@ function formatProblemTitle(problemId) {
         .join(' ');
 }
 
-
 // Create problem row HTML
 function createProblemRow(problemId, index) {
     return `
@@ -64,10 +60,7 @@ async function initializeGameTable() {
     const tableBody = document.querySelector('.game-table tbody');
     
     console.log(`Selected problem count: ${problems.length}`);
-
-    const isPlayer1Api = localStorage.getItem("isPlayer1Api")
-    const isPlayer2Api = localStorage.getItem("isPlayer2Api")
-  
+    
     selectedProblems = problems; 
     
     // Clear existing rows
@@ -100,28 +93,6 @@ async function initializeGameTable() {
     console.log("Game start time set to:", new Date(window.GAME_START_TIME).toISOString());
 }
 
-// Update UI with submission status
-function updateSubmissionUI(submissions) {
-    console.log("Updating UI with submissions:", submissions);
-    submissions.forEach((playerSubmissions, playerIndex) => {
-        playerSubmissions.forEach((isCorrect, problemIndex) => {
-            const boxId = `player${playerIndex + 1}Box${problemIndex + 1}`;
-            const box = document.getElementById(boxId);
-            if (box) {
-                box.textContent = isCorrect ? '🟢' : '🟡';
-            }
-        });
-        
-        // Update the score display for each player
-        const scoreElement = document.getElementById(`player${playerIndex + 1}-score`);
-        if (scoreElement) {
-            const totalSolved = playerSubmissions.filter(Boolean).length;
-            console.log(`Player ${playerIndex + 1} solved ${totalSolved} problems`);
-            scoreElement.textContent = totalSolved;
-        }
-    });
-}
-
 // Initialize game when page loads
 document.addEventListener('DOMContentLoaded', async () => {
     const socket = new WebSocket("ws://localhost:3000/ws");
@@ -142,10 +113,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         await getGameSettings();
         await initializeGameTable();
-
     }
     console.log(`Starting game with ${selectedProblemCount} problems`);
-    
- 
 }); 
 

@@ -1,8 +1,5 @@
-import updateSubmission from "../../../Backend/utils/gameLoop.js";
 import { userRecentSubmissions } from "../api/graphql_apis.js";
 
-const CHECKING_IF_PASSED = true; //Can change this to true if want to check a submission passed
-const CYCLE_AMOUNT = 15; //Number of seconds per API Call
 const NUM_USERS = 2;
 
 // Initialize time from localStorage or default to 10 minutes
@@ -10,38 +7,11 @@ var numMinutes = parseInt(localStorage.getItem("gameTime")) || 10;
 var numSeconds = 0;
 
 const gameOverPage = "assets/yeet_motion_html_files/yeet_motion.html";
-const gameOverPage2 = "assets/yeet_motion_html_files/rip_motion.html";
 
 // Function to count completed problems for a player
 function countCompletedProblems(playerIndex) {
     return window.currentCorrectSubmissions[playerIndex].filter(Boolean).length;
 }
-
-// Function to update the UI with submission status
-// function updateSubmissionUI(submissions) {
-//     console.log("Updating UI with submissions:", submissions);
-//     submissions.forEach((playerSubmissions, playerIndex) => {
-//         playerSubmissions.forEach((isCorrect, problemIndex) => {
-//             const boxId = `player${playerIndex + 1}Box${problemIndex + 1}`;
-//             const box = document.getElementById(boxId);
-//             if (box) {
-//                 // Only update if the problem is newly solved (wasn't solved before)
-//                 if (isCorrect && !window.currentCorrectSubmissions[playerIndex][problemIndex]) {
-//                     box.innerHTML = '<img src="assets/images/checkmark.png" alt="✓" style="width: 30px; height: 30px;">';
-//                 } else if (!isCorrect && !window.currentCorrectSubmissions[playerIndex][problemIndex]) {
-//                     box.textContent = '🟡';
-//                 }
-//             }
-//         });
-
-//         // Update the score display for each player
-//         const scoreElement = document.getElementById(`player${playerIndex + 1}-score`);
-//         if (scoreElement) {
-//             const totalSolved = playerSubmissions.filter(Boolean).length;
-//             scoreElement.textContent = totalSolved;
-//         }
-//     });
-// }
 
 // Function to determine winner and handle game over
 function handleGameOver() {

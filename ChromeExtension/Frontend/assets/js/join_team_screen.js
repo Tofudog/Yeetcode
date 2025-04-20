@@ -1,7 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     const confirmJoinButton = document.getElementById("confirm-join");
-    localStorage.setItem("isPlayer1Api", "false");
-    localStorage.setItem("isPlayer2Api", "true");
+
     const socket = new WebSocket("ws://localhost:3000/ws");
 
     confirmJoinButton.addEventListener("click", () => {

@@ -2,14 +2,11 @@ import { sendGameProblems } from "../api/mongo_api.js";
 // Get selected options from localStorage
 let gameState = JSON.parse(localStorage.getItem('gameState'));
 const selectedDifficulty = gameState.difficulty || "easy";
-const selectedTime = gameState.timeLimit || "60";
 const selectedProblemCount = gameState.problemCount|| 5;
+
 const player1Name = localStorage.getItem("Player1") || "Player 1";
 const player2Name = localStorage.getItem("Player2") || "Player 2";
 const gameId = localStorage.getItem("gameId");
-const battleType = gameState.battleType || "unknown"
-
-
 
 // Track selected problems for submission checking
 let selectedProblems = [];
@@ -65,7 +62,6 @@ async function initializeGameTable(socket) {
     selectedProblems = problems
     .sort(() => Math.random() - 0.5)
     .slice(0, selectedProblemCount);
-    console.log('HEREE IS THE GAME ID::', gameId);
     console.log(`Selected ${selectedProblems.length} problems out of ${problems.length} available`);
     await sendGameProblems(selectedProblems, gameId)
 
@@ -109,28 +105,6 @@ async function initializeGameTable(socket) {
     console.log("Game start time set to:", new Date(window.GAME_START_TIME).toISOString());
 }
 
-// Update UI with submission status
-function updateSubmissionUI(submissions) {
-    console.log("Updating UI with submissions:", submissions);
-    submissions.forEach((playerSubmissions, playerIndex) => {
-        playerSubmissions.forEach((isCorrect, problemIndex) => {
-            const boxId = `player${playerIndex + 1}Box${problemIndex + 1}`;
-            const box = document.getElementById(boxId);
-            if (box) {
-                box.textContent = isCorrect ? '🟢' : '🟡';
-            }
-        });
-        
-        // Update the score display for each player
-        const scoreElement = document.getElementById(`player${playerIndex + 1}-score`);
-        if (scoreElement) {
-            const totalSolved = playerSubmissions.filter(Boolean).length;
-            console.log(`Player ${playerIndex + 1} solved ${totalSolved} problems`);
-            scoreElement.textContent = totalSolved;
-        }
-    });
-}
-
 // Initialize game when page loads
 document.addEventListener('DOMContentLoaded', () => {
     let socket = new WebSocket("ws://localhost:3000/ws");
@@ -143,5 +117,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     console.log(`Starting game with ${selectedProblemCount} problems`);
     initializeGameTable(socket);
-    
 }); 
