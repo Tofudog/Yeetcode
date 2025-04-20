@@ -45,6 +45,18 @@ function handleGameOver() {
     }, 100);
 }
 
+// Listen for gameStateUpdated event from game_play2.js
+window.addEventListener('gameStateUpdated', (event) => {
+    if (event.detail && event.detail.timeLimit) {
+        const newTimeLimit = parseInt(event.detail.timeLimit);
+        if (newTimeLimit !== numMinutes) {
+            console.log(`Timer updated to ${newTimeLimit} minutes from custom event`);
+            numMinutes = newTimeLimit;
+            document.getElementById("timerText").innerText = timeFormated(numMinutes, numSeconds);
+        }
+    }
+});
+
 document.addEventListener("DOMContentLoaded", function () {
     // Initialize timer display with selected time
     document.getElementById("timerText").innerText = timeFormated(numMinutes, numSeconds);

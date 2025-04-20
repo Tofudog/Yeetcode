@@ -16,6 +16,12 @@ async function getGameSettings() {
         if (gameState.status === 'in_progress') {
             selectedProblemCount = gameState.problemCount;
             console.log("Selected problem count:", selectedProblemCount);
+            console.log("Game time limit:", gameState.timeLimit, "minutes");
+            
+            // Dispatch an event to notify timer2.js that gameState has been updated
+            window.dispatchEvent(new CustomEvent('gameStateUpdated', { 
+                detail: { timeLimit: gameState.timeLimit } 
+            }));
         } else {
             console.error("No game settings found");
             selectedProblemCount = 3; // Default value
@@ -108,8 +114,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         const data = JSON.parse(event.data);
         if (data.type === "problems_sent_send_2") {
             console.log("Problems sent over successfully");
+            
+            // Store game state in localStorage
             localStorage.setItem("gameState", JSON.stringify(data.gameState));
             localStorage.setItem("selectedProblems", JSON.stringify(data.selectedProblems));
+            
+            // Log the received gameState for debugging
+            const gameState = data.gameState;
+            console.log("Received gameState:", gameState);
+            if (gameState && gameState.timeLimit) {
+                console.log("Time limit from player1:", gameState.timeLimit);
+            }
         }
         await getGameSettings();
         await initializeGameTable();

@@ -2,8 +2,9 @@ import { userRecentSubmissions } from "../api/graphql_apis.js";
 
 const NUM_USERS = 2;
 
-// Initialize time from localStorage or default to 10 minutes
-var numMinutes = parseInt(localStorage.getItem("gameTime")) || 10;
+// Initialize time from gameState's timeLimit or default to 10 minutes
+let gameState = JSON.parse(localStorage.getItem('gameState')) || {};
+var numMinutes = gameState.timeLimit ? parseInt(gameState.timeLimit) : 10;
 var numSeconds = 0;
 
 const gameOverPage = "assets/yeet_motion_html_files/yeet_motion.html";
@@ -47,6 +48,7 @@ function handleGameOver() {
 document.addEventListener("DOMContentLoaded", function () {
     // Initialize timer display with selected time
     document.getElementById("timerText").innerText = timeFormated(numMinutes, numSeconds);
+    console.log(`Timer initialized with ${numMinutes} minutes from gameState`);
 });
 
 function getNextTime(minutes, seconds) {
