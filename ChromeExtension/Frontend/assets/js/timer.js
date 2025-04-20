@@ -4,6 +4,8 @@ const NUM_USERS = 2;
 
 // Initialize time from gameState's timeLimit or default to 10 minutes
 let gameState = JSON.parse(localStorage.getItem('gameState')) || {};
+const PLAYER1 = gameState.player1 || localStorage.getItem("player1");
+const PLAYER2 = gameState.player2 || localStorage.getItem("player2");
 var numMinutes = gameState.timeLimit ? parseInt(gameState.timeLimit) : 10;
 var numSeconds = 0;
 
@@ -16,23 +18,23 @@ function countCompletedProblems(playerIndex) {
 
 // Function to determine winner and handle game over
 function handleGameOver() {
-    const player1Completed = countCompletedProblems(0);
-    const player2Completed = countCompletedProblems(1);
+    const p1Done = countCompletedProblems(0);
+    const p2Done = countCompletedProblems(1);
     
-    console.log(`Player 1 completed: ${player1Completed}, Player 2 completed: ${player2Completed}`);
+    console.log(`Player 1 completed: ${p1Done}, Player 2 completed: ${p2Done}`);
     
     // Determine winner
     let winner, loser;
-    if (player1Completed > player2Completed) {
-        winner = window.PLAYER1;
-        loser = window.PLAYER2;
-    } else if (player2Completed > player1Completed) {
-        winner = window.PLAYER2;
-        loser = window.PLAYER1;
+    if (p1Done > p2Done) {
+        winner = PLAYER1;
+        loser = PLAYER2;
+    } else if (p2Done > p1Done) {
+        winner = PLAYER2;
+        loser = PLAYER1;
     } else {
         // Tie - use time as tiebreaker
-        winner = window.PLAYER1;
-        loser = window.PLAYER2;
+        winner = PLAYER1;
+        loser = PLAYER2;
     }
     
     // Store loser's name for the animation
@@ -40,9 +42,7 @@ function handleGameOver() {
     localStorage.setItem("loserName", loser);
     
     // Add a small delay to ensure localStorage is updated
-    setTimeout(() => {
-        window.location.href = gameOverPage;
-    }, 100);
+    setTimeout(() => window.location.href = gameOverPage, 100);
 }
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -89,11 +89,11 @@ var intervalTimer = setInterval(async function() {
     chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
         if (message.action === "triggerUserSubmissionAPICall") {
             console.log("Clicked on submit button");
-            //I don't want to run these few lines more than once!
-            //so maybe make window.PROBLEM_TO_HASH and window.USER_TO_HASH a thing
             const problemList = window.PROBLEM_LIST;
             const NUM_PROBLEMS = problemList.length;
-            let userList = [window.PLAYER1, window.PLAYER2];
+            const userList = [PLAYER1, PLAYER2];
+            console.log(`Using player names: player1=${PLAYER1}, player2=${PLAYER2}`);
+            
             let userToHash = new Map();  //assign each user a number
             let problemToHash = new Map();  //assign each problem a number 
             for (var i = 0; i < NUM_USERS; i++) {
@@ -105,32 +105,46 @@ var intervalTimer = setInterval(async function() {
 
             // Check if submission has changed
             for (const PLAYER of userList) {
-                const recentSubmissions = await userRecentSubmissions(PLAYER, 1);
-                const title = titleToSlug(recentSubmissions[0].title);
-                const timestamp = recentSubmissions[0].timestamp;
-                const status = recentSubmissions[0].status;
-                
-                const playerIdx = userToHash.get(PLAYER);
-                let titleIdx = null;
-                if (problemToHash.has(title)) {
-                    titleIdx = problemToHash.get(title);
-                }
-                else {
-                    //edge case: current player solved a problem not on the sheet
-                    continue;
-                }
-
-                const boxId = `player${playerIdx + 1}Box${titleIdx + 1}`;
-                const box = document.getElementById(boxId);
-                if (box) {
-                    if (status == "Accepted") {
-                        currentCorrectSubmissions[playerIdx][titleIdx] = true;
-                        box.innerHTML = '<img src="assets/images/checkmark.png" alt="✓" style="width: 30px; height: 30px;">';
+                try {
+                    console.log(`Checking recent submissions for ${PLAYER}`);
+                    const recentSubmissions = await userRecentSubmissions(PLAYER, 1);
+                    
+                    // Check if we have valid submission data
+                    if (!recentSubmissions || !recentSubmissions[0]) {
+                        console.log(`No recent submissions found for ${PLAYER}`);
+                        continue; // Skip this player
+                    }
+                    
+                    console.log(`Found submission for ${PLAYER}:`, recentSubmissions[0]);
+                    const title = titleToSlug(recentSubmissions[0].title);
+                    const timestamp = recentSubmissions[0].timestamp;
+                    const status = recentSubmissions[0].status;
+                    
+                    const playerIdx = userToHash.get(PLAYER);
+                    let titleIdx = null;
+                    if (problemToHash.has(title)) {
+                        titleIdx = problemToHash.get(title);
                     }
                     else {
-                        box.innerHTML = '<img src="assets/images/xmark.png" alt="x" style="width: 30px; height: 30px;">';
+                        //edge case: current player solved a problem not on the sheet
+                        console.log(`Problem "${title}" is not in the game problem list`);
+                        continue;
                     }
-                    console.log(currentCorrectSubmissions);
+
+                    const boxId = `player${playerIdx + 1}Box${titleIdx + 1}`;
+                    const box = document.getElementById(boxId);
+                    if (box) {
+                        if (status == "Accepted") {
+                            window.currentCorrectSubmissions[playerIdx][titleIdx] = true;
+                            box.innerHTML = '<img src="assets/images/checkmark.png" alt="✓" style="width: 30px; height: 30px;">';
+                        }
+                        else {
+                            box.innerHTML = '<img src="assets/images/xmark.png" alt="x" style="width: 30px; height: 30px;">';
+                        }
+                        console.log(window.currentCorrectSubmissions);
+                    }
+                } catch (error) {
+                    console.error(`Error checking submissions for ${PLAYER}:`, error);
                 }
             }
 
