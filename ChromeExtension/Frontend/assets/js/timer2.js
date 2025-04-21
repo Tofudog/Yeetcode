@@ -137,7 +137,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
             console.log("Clicked on submit button");
             console.log("THIS IS PROBLEM LIST", problemList);
-            let recentSubmissions = await userRecentSubmissions(player1, 1);
+            let recentSubmissions = await userRecentSubmissions(player2, 1);
             let title = titleToSlug(recentSubmissions[0].title);
             let timestamp = recentSubmissions[0].timestamp;
             let status = recentSubmissions[0].status;
