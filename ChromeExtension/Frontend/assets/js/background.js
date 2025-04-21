@@ -46,10 +46,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 })
 
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if(request.action === 'updateUI_send_2_rebound_2')
-    chrome.runtime.sendMessage({action: "updateUI_send_2_rebound_3"})
-})
+// chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+//     if(request.action === 'updateUI_send_2_rebound_2')
+//     chrome.runtime.sendMessage({action: "updateUI_send_2_rebound_3"})
+// })
 
 //     console.log("THIS IS THE TAB URL: " + tab.url)
 //     if (tab.url && tab.url.includes("https://chatgpt.com/")) {

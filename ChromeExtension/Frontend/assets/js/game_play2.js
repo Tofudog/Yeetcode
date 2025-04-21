@@ -234,9 +234,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         if(data.type === "updateUI_send_2_rebound") {
             localStorage.setItem("problemMapPlayer1", JSON.stringify(data.problemMapPlayer1));
-            chrome.runtime.sendMessage({
-                action: "updateUI_send_2_rebound_2", 
-            });
+            if(problemList.length === 0) {
+                problemList = JSON.parse(localStorage.getItem("selectedProblems"))
+            }
+
+            let problemMapPlayer2 = JSON.parse(localStorage.getItem("problemMapPlayer2"))
+            updateUI(problemList, {}, problemMapPlayer2);
+            console.log("333about to try out sending message to screen1 from player2 submit");
+            console.log(`P3332 map yuuuu: ${localStorage.getItem("problemMapPlayer2")}`);
         }
     }
 
@@ -277,12 +282,13 @@ async function startTimer() {
         socket.onmessage = async (event) => {
             const data = JSON.parse(event.data);
             if(data.type === "updateUI_send_2_rebound") {
+                console.log("got to update player1 UI")
                 localStorage.setItem("problemMapPlayer1", JSON.stringify(data.problemMapPlayer1));
                 //console.log(`Here is mappp: ${localStorage.getItem("problemMapPlayer1")}`);
                 updateUI(localStorage.getItem("selectedProblems"), localStorage.getItem("problemMapPlayer1"), {});
-                chrome.runtime.sendMessage({
-                    action: "updateUI_send_2_rebound_2", 
-                });
+                // chrome.runtime.sendMessage({
+                //     action: "updateUI_send_2_rebound_2", 
+                // });
             }
         }
     
@@ -316,16 +322,16 @@ async function startTimer() {
                 socket.send(JSON.stringify(socketPayload));
             }
     
-            if(message.action === "updateUI_send_1_rebound_3") {
-                if(problemList.length === 0) {
-                    problemList = JSON.parse(localStorage.getItem("selectedProblems"))
-                }
+            // if(message.action === "updateUI_send_1_rebound_3") {
+            //     if(problemList.length === 0) {
+            //         problemList = JSON.parse(localStorage.getItem("selectedProblems"))
+            //     }
     
-                let problemMapPlayer2 = JSON.parse(localStorage.getItem("problemMapPlayer2"))
-                updateUI(problemList, {}, problemMapPlayer2);
-                console.log("333about to try out sending message to screen1 from player2 submit");
-                console.log(`P3332 map yuuuu: ${localStorage.getItem("problemMapPlayer2")}`);
-            }
+            //     let problemMapPlayer2 = JSON.parse(localStorage.getItem("problemMapPlayer2"))
+            //     updateUI(problemList, {}, problemMapPlayer2);
+            //     console.log("333about to try out sending message to screen1 from player2 submit");
+            //     console.log(`P3332 map yuuuu: ${localStorage.getItem("problemMapPlayer2")}`);
+            // }
         });
 
         chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
