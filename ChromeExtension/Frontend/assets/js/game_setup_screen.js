@@ -1,6 +1,6 @@
 // Define the options for the pickers
 const problemOptions = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-const timeOptions = [5, 10, 15, 20, 30, 60];
+const timeOptions = [1, 5, 10, 15, 20, 30, 60];
 
 // Function to dynamically generate picker items
 function generatePickerItems(pickerId, options, formatFn = (val) => val) {

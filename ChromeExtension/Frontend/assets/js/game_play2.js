@@ -6,7 +6,7 @@ const player2Name = localStorage.getItem("player2") || "Player 2";
 const gameId = localStorage.getItem("gameId");
 const socket = new WebSocket("ws://localhost:3000/ws");
 const NUM_USERS = 2;
-const gameOverPage = "assets/yeet_motion_html_files/yeet_motion.html";
+const gameOverPage = "game-over-win.html";
 let selectedProblems = [];
 let selectedProblemCount;
 

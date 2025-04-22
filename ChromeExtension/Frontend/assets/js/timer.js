@@ -8,8 +8,7 @@ let gameState = JSON.parse(localStorage.getItem("gameState"));
 var numMinutes = gameState.timeLimit|| 10;
 var numSeconds = 0;
 
-const gameOverPage = "assets/yeet_motion_html_files/yeet_motion.html";
-const gameOverPage2 = "assets/yeet_motion_html_files/rip_motion.html";
+var gameOverPage = "game-over-lose.html";
 
 function countCompletedProblems(playerIndex) {
     return window.currentCorrectSubmissions[playerIndex].filter(Boolean).length;
