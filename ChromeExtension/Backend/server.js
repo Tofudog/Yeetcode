@@ -6,6 +6,7 @@ import connectDB from './config/db.js';
 import gameRoutes from './routes/gameRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import authRoutes from './routes/authRoutes.js';
+import eloRoutes from './routes/eloRoutes.js';
 import { fetchRecentSubmissions } from './utils/leetcodeGraphQLQueries.js';
 import { validateUser } from './utils/leetcodeGraphQLQueries.js';
 import { deleteAllUsers } from './controllers/userController.js';
@@ -106,6 +107,7 @@ connectDB();
 app.use('/api/users', userRoutes);
 app.use('/api/games', gameRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/elo', eloRoutes);
 
 // //<!-------------------Listening for updates for Leetcode Problems----------->
 // Game.watch([

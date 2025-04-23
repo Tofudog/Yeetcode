@@ -21,10 +21,10 @@ const UserSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Game'
   }],
-  // elo: {
-  //   type: Float32Array,
-  //   default:
-  // }
+  elo: {
+    type: String,
+    default: "1500"
+  }
 });
 
 const User = mongoose.model('User', UserSchema);
