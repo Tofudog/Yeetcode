@@ -5,13 +5,10 @@ body {
 
 /* Logo styling */
 img.logo {
-    width: 55%; /* Increased width */
-    max-width: 180px;
-    height: auto; /* Maintain aspect ratio */
-    min-height: 100px; /* Ensure minimum height */
-    object-fit: contain; /* Ensure image isn't distorted */
-    margin-bottom: 20px; /* Increased margin for better spacing */
-    margin-top: 10px; /* Add margin to the top */
+    min-height: 0;
+    height: 20vh;
+    width: 55%;
+    object-fit: fill;
     transition: transform 0.3s ease;
 }
 

@@ -1,0 +1,102 @@
+body {
+    background-color: #ffffff;
+    color: #000000;
+    font-family: 'Courier New', Courier, monospace;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.center-container {
+    text-align: center;
+}
+
+.side-by-side {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 10px 0;
+}
+
+.login-button {
+    background-color: #e4c07b;
+    color: #ffffff;
+    border: none;
+    border-radius: 9999px;
+    padding: 10px 24px;
+    font-size: 1.3rem;
+    font-family: 'Courier New', Courier, monospace;
+    cursor: pointer;
+    margin: 10px;
+}
+
+.fake-input {
+    display: inline-block;
+    min-width: 1ch;
+    outline: none;
+    border: none;
+    color: black;
+    font-family: 'Courier New', Courier, monospace;
+    white-space: nowrap;
+    caret-color: transparent;
+    position: relative;
+    font-size: 1.3rem;
+    padding-right: 10px;
+    line-height: 1.3rem;
+    vertical-align: middle;
+    height: 1.3rem;
+}
+
+.fake-input:empty::before {
+    content: '\200B';
+    display: inline-block;
+}
+
+.fake-input.active {
+    border-bottom: 1px solid black;
+}
+
+.fake-input::after {
+    content: '▮';
+    display: none;
+    animation: blink 1s step-start infinite;
+    position: absolute;
+    margin-left: -2px;
+    transform: scale(1.25);
+    transform-origin: center left;
+    top: 0;
+    line-height: 1.3rem;
+}
+
+.fake-input.active::after {
+    display: inline-block;
+}
+
+.end-quote {
+    transition: margin-left 0.2s ease, transform 0.2s ease;
+    display: inline-block;
+    margin-left: 0;
+}
+
+.end-quote.shifted {
+    margin-left: -10px;
+    transform: none;
+}
+
+@keyframes blink {
+    50% {
+        opacity: 0;
+    }
+}
+
+.logo {
+    margin: 20px;
+    max-width: 75%;
+    height: auto;
+}
+
+.label-text {
+    font-size: 1.3rem;
+}
