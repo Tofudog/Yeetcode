@@ -8,7 +8,11 @@ async function getUserElo(yeetcode_username) {
             yeetcode_username
         })
     });
-    return response.elo;
+    if (response.ok) {
+        const data = await response.json();
+        return data.elo;
+    }
+    return "response.elo;";
 }
 
 document.addEventListener("DOMContentLoaded", function () {
