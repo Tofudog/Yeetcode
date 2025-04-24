@@ -24,6 +24,18 @@ const UserSchema = new mongoose.Schema({
   elo: {
     type: String,
     default: "1500"
+  },
+  title: {
+    type: String,
+    default: "Pupil"
+  },
+  bio: {
+    type: String,
+    default: ""
+  },
+  university: {
+    type: String,
+    default: ""
   }
 });
 

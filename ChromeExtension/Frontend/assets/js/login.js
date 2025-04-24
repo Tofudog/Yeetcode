@@ -1,3 +1,16 @@
+async function getUserElo(yeetcode_username) {
+    const response = await fetch("https://yeetcode-81k4.onrender.com/api/elo/getElo", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            yeetcode_username
+        })
+    });
+    return response.elo;
+}
+
 document.addEventListener("DOMContentLoaded", function () {
     const loginButton = document.getElementById("yeetcode-login-button");
     const signupButton = document.getElementById("yeetcode-signup-button");
@@ -32,7 +45,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (response.ok) {
                 //make api calls
-                const elo = "1501";
+                const elo = await getUserElo(yeetcode_username);
                 const title = "Pupil";
                 const bio = "";
                 const uni = "";
