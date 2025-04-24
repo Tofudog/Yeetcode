@@ -6,8 +6,10 @@ body {
 /* Logo styling */
 img.logo {
     min-height: 0;
-    height: 20vh;
+    height: 25vh;
     width: 55%;
+    margin-top: -20px;
+    margin-bottom: -20px;
     object-fit: fill;
     transition: transform 0.3s ease;
 }
