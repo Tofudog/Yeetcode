@@ -7,7 +7,7 @@ const selectedProblemCount = gameState.problemCount|| 5;
 const player1Name = localStorage.getItem("player1") || "Player 1";
 const player2Name = localStorage.getItem("player2") || "Player 2";
 const gameId = localStorage.getItem("gameId");
-const battleType = gameState.battleType || "unknown"
+const battleType = gameState.battleType || "unknown" 
 
 // Track selected problems for submission checking
 let selectedProblems = [];
