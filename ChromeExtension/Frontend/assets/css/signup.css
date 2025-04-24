@@ -8,8 +8,8 @@ img.logo {
     min-height: 0;
     height: 25vh;
     width: 55%;
-    margin-top: -20px;
-    margin-bottom: -20px;
+    margin-top: -5%;
+    margin-bottom: -10%;
     object-fit: fill;
     transition: transform 0.3s ease;
 }
