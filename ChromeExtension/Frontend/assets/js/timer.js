@@ -1,5 +1,5 @@
 import { userRecentSubmissions } from "../api/graphql_apis.js";
-import { getNextTime, timeFormated, titleToSlug } from "./utils.js";
+import { getNextTime, timeFormated, titleToSlug, updateRating } from "./utils.js";
 
 const NUM_USERS = 2;
 let gameState = JSON.parse(localStorage.getItem("gameState"));
@@ -19,24 +19,62 @@ function countCompletedProblems(playerIndex) {
     return window.currentCorrectSubmissions[playerIndex].filter(Boolean).length;
 }
 
+async function getUserElo(yeetcode_username) {
+    const response = await fetch("https://yeetcode-production-a720.up.railway.app/api/elo/getElo", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            yeetcode_username: yeetcode_username
+        })
+    });
+    const data = await response.json();
+    return data.elo;
+}
+
+async function updateUserElo(yeetcode_username, newElo) {
+    await fetch("https://yeetcode-production-a720.up.railway.app/api/elo/updateElo", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            yeetcode_username: yeetcode_username,
+            newElo: newElo
+        })
+    });
+}
+
 // Function to determine winner and handle game over
-function handleGameOver() {
+async function handleGameOver() {
     // Use the score variable instead of counting completed problems
     const player1Score = score[0];
     const player2Score = score[1];
+    const yeetcode_username = localStorage.getItem("yeetcode_username");
+    const curElo = await getUserElo(yeetcode_username);
+    const oppElo = curElo;
     
     console.log(`Player 1 score: ${player1Score}, Player 2 score: ${player2Score}`);
     
     // Determine winner
     let winner, loser;
     if (player1Score > player2Score) {
+        //You won, as you are player 1
         winner = window.PLAYER1;
         loser = window.PLAYER2;
         gameOverPage = gameOverPageWin;
+        const newElo = updateRating(1, curElo, oppElo);
+        await updateUserElo(yeetcode_username, newElo);
+        localStorage.setItem("my-elo", newElo);
     } else if (player2Score > player1Score) {
+        //You lost, as you are player 1
         winner = window.PLAYER2;
         loser = window.PLAYER1;
         gameOverPage = gameOverPageLose;
+        const newElo = updateRating(-1, curElo, oppElo);
+        await updateUserElo(yeetcode_username, newElo);
+        localStorage.setItem("my-elo", newElo);
     } else {
         // Tie - use time as tiebreaker
         window.location.href = gameOverPage2;
