@@ -22,7 +22,7 @@
     }
   ],
   "action": {
-    "default_icon": "Frontend/assets/images/logo.png"
+    "default_icon": "Frontend/assets/images/logo_thumbnail.png"
   },
 
   "web_accessible_resources": [
