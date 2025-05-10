@@ -137,6 +137,7 @@ a {
 .list-class {
     font-size: medium;
     line-height: 25px;
+    padding-right: 15px;
 }
 
 #middle-box,
