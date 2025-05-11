@@ -34,4 +34,30 @@ function titleToSlug(title) {
         .replace(/(^-|-$)/g, '');
 }
 
-export {saveSession, getNextTime, timeFormated, titleToSlug};
+function updateRating(result, ownElo, opponentElo) {
+    ownElo = parseInt(ownElo);
+    opponentElo = parseInt(opponentElo);
+
+    // Calculate rating difference
+    let eloDiff = Math.abs(ownElo - opponentElo);
+    // Base rating change is 8 for ratings within 25 points
+    let baseChange = 8;
+    
+    // For every 25 points difference beyond the initial 25, add 1
+    if (eloDiff > 25) {
+        let additionalPoints = Math.floor((eloDiff - 25) / 25);
+        baseChange += additionalPoints;
+    }
+    
+    // Apply win/loss multiplier
+    baseChange *= (result === 1 ? 1 : -1);
+    // Calculate final rating change
+    let ratingChange = Math.round(baseChange);
+    
+    // Update rating
+    ownElo = Math.round(ownElo + ratingChange);
+    
+    return String(ownElo);
+}
+
+export {saveSession, getNextTime, timeFormated, titleToSlug, updateRating};
